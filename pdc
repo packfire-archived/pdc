@@ -1,0 +1,75 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Packfire Framework Dependency Checker (pdc)
+ * Written by Sam-Mauris Yong 23OCT2012
+ * 
+ * Released Open Source under New BSD 3-Clause License
+ * 
+ * Visit us at http://mauris.sg/packfire
+ */
+
+
+define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
+$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PDC_DIR), RecursiveIteratorIterator::CHILD_FIRST);
+
+function checkClassFile($namespace){
+    $path = PDC_DIR . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
+    return file_exists($path);
+}
+
+foreach ($iterator as $path) {
+    if ($path->isFile() && $path->getExtension() == 'php') {
+        //echo "Checking file $path\n";
+        $contents = file_get_contents((string)$path);
+        $index = array();
+        
+        $nsCheck = preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $contents, $namespace);
+        if($nsCheck){
+            $namespace = $namespace['namespace'];
+        }else{
+            $namespace = '';
+            echo "Warning: no namespace found.\n";
+        }
+        
+        $uses = array();
+        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $contents, $uses, PREG_SET_ORDER);
+        foreach($uses as $use){
+            if(isset($use['alias'])){
+                $index[$use['alias']] = $use['namespace'];
+            }else{
+                if(false !== $pos = strrpos($use['namespace'], '\\')){
+                    $alias = substr($use['namespace'], $pos + 1);
+                }else{
+                    $alias = $use['namespace'];
+                }
+                $index[$alias] = $use['namespace'];
+            }
+        }
+        
+        $regex = array(
+            '`new\\s(?<name>[a-zA-Z]+)\\(`s',
+            '`\\s(?<name>[a-zA-Z]+)\\:\\:`s'
+        );
+        $result = array();
+        foreach($regex as $reg){
+            $matches = array();
+            preg_match_all($reg, $contents, $matches, PREG_SET_ORDER);
+            $result = array_merge($result, $matches);
+        }
+        foreach($result as $entry){
+            $name = $entry['name'];
+            if(!preg_match('`(parent|self|static)`', $name)){
+                $resolved = $name;
+                if(isset($index[$name])){
+                    $resolved = $index[$name];
+                }elseif(substr($name, 0, 1) != '\\'){
+                    $resolved = $namespace . '\\' . $name;
+                }
+                if(class_exists($resolved) || !checkClassFile($resolved)){
+                    echo "Not found: $resolved\n";
+                }
+            }
+        }
+    }
+}
