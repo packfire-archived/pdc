@@ -2,13 +2,21 @@
 <?php
 /**
  * Packfire Framework Dependency Checker (pdc)
- * Written by Sam-Mauris Yong 23OCT2012
+ * Written by Sam-Mauris Yong
  * 
  * Released Open Source under New BSD 3-Clause License
  * 
  * Visit us at http://mauris.sg/packfire
  */
 
+echo "Packfire Framework Dependency Checker Tool
+Written by Sam-Mauris Yong v1.0.1\n\n";
+
+$stats = array(
+    'files' => 0,
+    'warning' => 0,
+    'notFound' => 0
+);
 
 define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PDC_DIR), RecursiveIteratorIterator::CHILD_FIRST);
@@ -19,15 +27,19 @@ function checkClassFile($namespace){
 }
 
 foreach ($iterator as $path) {
-    if ($path->isFile() && $path->getExtension() == 'php') {
+    $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
+    if ($path->isFile() && $extension == 'php') {
+        ++$stats['files'];
         //echo "Checking file $path\n";
         $contents = file_get_contents((string)$path);
         $index = array();
         
+        $namespace = array();
         $nsCheck = preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $contents, $namespace);
         if($nsCheck){
             $namespace = $namespace['namespace'];
         }else{
+            ++$stats['warning'];
             $namespace = '';
             echo "Warning: no namespace found.\n";
         }
@@ -68,8 +80,18 @@ foreach ($iterator as $path) {
                 }
                 if(class_exists($resolved) || !checkClassFile($resolved)){
                     echo "Not found: $resolved\n";
+                    ++$stats['notFound'];
                 }
             }
         }
     }
+}
+
+echo "\nCompleted. Summary:\n";
+echo $stats['files'] . " files\n";
+if($stats['warning']){
+    echo $stats['warning'] . " warnings\n";
+}
+if($stats['notFound']){
+    echo $stats['notFound'] . " dependency not found\n";
 }
