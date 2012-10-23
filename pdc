@@ -26,6 +26,18 @@ function checkClassFile($namespace){
     return file_exists($path);
 }
 
+function sigFig($value, $sigFigs = 3) {
+	//convert to scientific notation e.g. 12345 -> 1.2345x10^4
+	//where $significand is 1.2345 and $exponent is 4
+	$exponent = floor(log10(abs($value))+1);
+	$significand = round(($value
+		/ pow(10, $exponent))
+		* pow(10, $sigFigs))
+		/ pow(10, $sigFigs);
+	return $significand * pow(10, $exponent);
+}
+
+$startTime = microtime(true);
 foreach ($iterator as $path) {
     $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
     if ($path->isFile() && $extension == 'php') {
@@ -86,6 +98,9 @@ foreach ($iterator as $path) {
         }
     }
 }
+$timeTaken = microtime(true) - $startTime;
+
+echo 'Time: ' . sigFig($timeTaken, 5) . " seconds\n";
 
 echo "\nCompleted. Summary:\n";
 echo $stats['files'] . " files\n";
