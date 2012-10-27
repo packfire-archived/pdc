@@ -99,6 +99,12 @@ foreach ($iterator as $path) {
                 }
             }
         }
+        $diff = array_diff(array_keys($index), array_keys($used));
+        if(count($diff) > 0){
+            foreach($diff as $unused){
+                $buffer .= "Unused: $unused\n";
+            }
+        }
         if($buffer){
             echo "[$path]:\n" . $buffer;
         }
