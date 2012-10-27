@@ -42,6 +42,7 @@ foreach ($iterator as $path) {
     $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
     if ($path->isFile() && $extension == 'php') {
         ++$stats['files'];
+        $buffer = '';
         //echo "Checking file $path\n";
         $contents = file_get_contents((string)$path);
         $index = array();
@@ -53,7 +54,7 @@ foreach ($iterator as $path) {
         }else{
             ++$stats['warning'];
             $namespace = '';
-            echo "Warning: no namespace found.\n";
+            $buffer .= "Warning: no namespace found.\n";
         }
         
         $uses = array();
@@ -81,20 +82,25 @@ foreach ($iterator as $path) {
             preg_match_all($reg, $contents, $matches, PREG_SET_ORDER);
             $result = array_merge($result, $matches);
         }
+        $used = array();
         foreach($result as $entry){
             $name = $entry['name'];
             if(!preg_match('`(parent|self|static)`', $name)){
                 $resolved = $name;
                 if(isset($index[$name])){
+                    $used[$name] = true;
                     $resolved = $index[$name];
                 }elseif(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
                 }
                 if(class_exists($resolved) || !checkClassFile($resolved)){
-                    echo "Not found: $resolved\n";
+                    $buffer .= "Not found: $resolved\n";
                     ++$stats['notFound'];
                 }
             }
+        }
+        if($buffer){
+            echo "[$path]:\n" . $buffer;
         }
     }
 }
