@@ -28,7 +28,7 @@ if(PDC_AUTOLOAD){
 }
 function checkClassFile($namespace){
     $path = PDC_DIR . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
-    return class_exists($resolved) || interface_exists($resolved) || file_exists($path);
+    return class_exists($namespace) || interface_exists($namespace) || file_exists($path);
 }
 
 function sigFig($value, $sigFigs = 3) {
