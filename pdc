@@ -37,6 +37,43 @@ function sigFig($value, $sigFigs = 3) {
 	return $significand * pow(10, $exponent);
 }
 
+
+function get_php_classes($php_code) {
+    $classes = array();
+    $tokens = token_get_all($php_code);
+    $count = count($tokens);
+    $nextString = false;
+    for ($i = 0; $i < $count; ++$i) {
+        if(is_array($tokens[$i])){
+            $current = $tokens[$i][0];
+            if ($current == T_NEW || $current == T_EXTENDS) {
+                $nextString = true;
+            }elseif($current == T_PAAMAYIM_NEKUDOTAYIM
+              && $tokens[$i - 1][0] == T_STRING){
+                $class = $tokens[$i - 1][1];
+                $classes[] = $class;
+            }elseif($current == T_IMPLEMENTS){
+                while(++$i < $count){
+                    if(is_array($tokens[$i])){
+                        if($tokens[$i][0] == T_STRING){
+                            $class = $tokens[$i][1];
+                            $classes[] = $class;
+                        }
+                    }elseif($tokens[$i] == '{'){
+                        break;
+                    }
+                }
+            }
+            if($nextString && $current == T_STRING){
+                $class = $tokens[$i][1];
+                $classes[] = $class;
+                $nextString = false;
+            }
+        }
+    }
+    return $classes;
+}
+
 $startTime = microtime(true);
 foreach ($iterator as $path) {
     $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
@@ -72,18 +109,7 @@ foreach ($iterator as $path) {
             }
         }
         
-        $regex = array(
-            '`new\\s(?<name>[a-zA-Z]+)\\(`s',
-            '`\\s(?<name>[a-zA-Z]+)\\:\\:`s',
-            '`extends\\s(?<name>[a-zA-Z]+)`s',
-            '`implements\\s(?<name>[a-zA-Z]+)`s'
-        );
-        $result = array();
-        foreach($regex as $reg){
-            $matches = array();
-            preg_match_all($reg, $contents, $matches, PREG_SET_ORDER);
-            $result = array_merge($result, $matches);
-        }
+        $result = get_php_classes($contents);
         $used = array();
         foreach($result as $entry){
             $name = $entry['name'];
