@@ -22,9 +22,13 @@ $stats = array(
 define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PDC_DIR), RecursiveIteratorIterator::CHILD_FIRST);
 
+define('PDC_AUTOLOAD', isset($argv[2]) ? $argv[2] : '');
+if(PDC_AUTOLOAD){
+    require PDC_AUTOLOAD;
+}
 function checkClassFile($namespace){
     $path = PDC_DIR . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
-    return file_exists($path);
+    return class_exists($resolved) || interface_exists($resolved) || file_exists($path);
 }
 
 function sigFig($value, $sigFigs = 3) {
@@ -144,7 +148,7 @@ foreach ($iterator as $path) {
                 }elseif(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
                 }
-                if(!class_exists($resolved) && !interface_exists($resolved) && !checkClassFile($resolved)){
+                if(!checkClassFile($resolved)){
                     $buffer .= "Not found: $resolved\n";
                     ++$stats['notFound'];
                 }
