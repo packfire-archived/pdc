@@ -74,7 +74,9 @@ foreach ($iterator as $path) {
         
         $regex = array(
             '`new\\s(?<name>[a-zA-Z]+)\\(`s',
-            '`\\s(?<name>[a-zA-Z]+)\\:\\:`s'
+            '`\\s(?<name>[a-zA-Z]+)\\:\\:`s',
+            '`extends\\s(?<name>[a-zA-Z]+)`s',
+            '`implements\\s(?<name>[a-zA-Z]+)`s'
         );
         $result = array();
         foreach($regex as $reg){
