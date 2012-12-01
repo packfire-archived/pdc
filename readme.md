@@ -9,6 +9,7 @@ While most coding errors are reported, with the new autoloading in PHP 5.3, erro
 - Class dependencies linkage breaks after file renamed or mvoed
 - Files contain naming mistake in namespaces or classes
 - Problematic `use` statements
+- Unused `use` statements
 
 Some of these problems don't show up in tests or even in usage until manual check uncovers it. 
 
@@ -26,6 +27,10 @@ PDC is a Command Line Interface (CLI) tool. It does not have an graphical interf
 
     $ pdc /path/to/src
 
+An optional second parameter allows you to define the autoloader for PDC to perform additional checking. So for example if you use [Composer](http://getcomposer.org/), you can use `vendor/autoload.php` as your second parameter like this:
+
+    $pdc src/ vendor/autoload.php
+
 You can clone this repository and directly run PDC in your Travis-CI builds in the same manner by adding the following into your `.travis.yml` file:
 
     after_script:
@@ -34,4 +39,4 @@ You can clone this repository and directly run PDC in your Travis-CI builds in t
 
 ##License
 
-PDC is licensed under the BSD 3-Clause License. 
+PDC is licensed under the BSD 3-Clause License. See license file in repository for details.
