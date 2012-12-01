@@ -115,7 +115,7 @@ foreach ($iterator as $path) {
         $index = array();
 
         $className = $path->getBasename('.php');
-        if(preg_match('`class\\s' . $className . '\\W`s', $contents) == 0){
+        if(preg_match('`(class|interface)\\s' . $className . '\\W`s', $contents) == 0){
             $buffer .= "File name / Class name mismatch: $className\n";
             ++$stats['mismatch'];
         }
