@@ -16,7 +16,8 @@ $stats = array(
     'files' => 0,
     'warning' => 0,
     'notFound' => 0,
-    'unused' => 0
+    'unused' => 0,
+    'mismatch' => 0
 );
 
 define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
@@ -28,7 +29,7 @@ if(PDC_AUTOLOAD){
 }
 function checkClassFile($namespace){
     $path = PDC_DIR . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
-    return class_exists($namespace) || interface_exists($namespace) || file_exists($path);
+    return class_exists($namespace) || interface_exists($namespace);
 }
 
 function sigFig($value, $sigFigs = 3) {
@@ -112,6 +113,12 @@ foreach ($iterator as $path) {
         //echo "Checking file $path\n";
         $contents = file_get_contents((string)$path);
         $index = array();
+
+        $className = $path->getBasename('.php');
+        if(preg_match('`class\\s' . $className . '\\W`s') == 0){
+            $buffer .= "File/class mismatch: $resolved\n";
+            ++$stats['mismatch'];
+        }
         
         $namespace = array();
         $nsCheck = preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $contents, $namespace);
@@ -170,7 +177,7 @@ $timeTaken = microtime(true) - $startTime;
 
 echo 'Time: ' . sigFig($timeTaken, 5) . " seconds\n";
 
-echo "\nCompleted. Summary:\n";
+echo "\nSummary:\n";
 echo $stats['files'] . " files\n";
 if($stats['warning']){
     echo $stats['warning'] . " warnings\n";
@@ -179,5 +186,10 @@ if($stats['notFound']){
     echo $stats['notFound'] . " dependency not found\n";
 }
 if($stats['unused']){
-    echo $stats['unused'] . " dependency not found\n";
+    echo $stats['unused'] . " unused class found\n";
 }
+if($stats['mismatch']){
+    echo $stats['mismatch'] . " class name and file name mismatch\n";
+}
+
+echo "\n--PDC Complete--\n";
