@@ -28,6 +28,10 @@ if(PDC_AUTOLOAD){
     require PDC_AUTOLOAD;
 }
 
+function getClassNameFromNameSpace($namespace){
+    return ltrim(substr($namespace, strrpos($namespace, '\\')), '\\');
+}
+
 function checkClassFile($namespace){
     if(class_exists($namespace) || interface_exists($namespace)){
         return true;
@@ -153,6 +157,7 @@ foreach ($iterator as $path) {
                     $alias = substr($use['namespace'], $pos + 1);
                 }else{
                     $alias = $use['namespace'];
+                    $index[getClassNameFromNameSpace($alias)] = $alias;
                 }
                 $index[$alias] = $use['namespace'];
             }
