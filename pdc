@@ -28,8 +28,14 @@ if(PDC_AUTOLOAD){
     require PDC_AUTOLOAD;
 }
 function checkClassFile($namespace){
-    spl_autoload($namespace);
-    return class_exists($namespace) || interface_exists($namespace);
+    $autoloads = spl_autoload_functions();
+    foreach($autoloads as $autoload){
+        $autoload($namespace);
+        if(class_exists($namespace) || interface_exists($namespace)){
+            return true;
+        }
+    }
+    return false;
 }
 
 function sigFig($value, $sigFigs = 3) {
