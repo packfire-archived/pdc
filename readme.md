@@ -29,7 +29,7 @@ PDC is a Command Line Interface (CLI) tool. It does not have an graphical interf
 
 An optional second parameter allows you to define the autoloader for PDC to perform additional checking. So for example if you use [Composer](http://getcomposer.org/), you can use `vendor/autoload.php` as your second parameter like this:
 
-    $pdc src/ vendor/autoload.php
+    $ pdc src/ vendor/autoload.php
 
 You can clone this repository and directly run PDC in your Travis-CI builds in the same manner by adding the following into your `.travis.yml` file:
 
