@@ -32,7 +32,7 @@ function checkClassFile($namespace){
     $autoloads = spl_autoload_functions();
     if($autoloads){
         foreach($autoloads as $autoload){
-            $autoload($namespace);
+            call_user_func($autoload, $namespace);
             if(class_exists($namespace) || interface_exists($namespace)){
                 return true;
             }
