@@ -86,7 +86,7 @@ function get_php_classes($php_code) {
                 while(++$i < $count){
                     if(is_array($tokens[$i])){
                         $current = $tokens[$i][0];
-                        if($current == T_STRING){
+                        if($current == T_STRING || $current == T_NS_SEPARATOR){
                             $class = getFullClass($tokens, $i, $count);
                             $classes[] = $class;
                             --$i;
