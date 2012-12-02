@@ -82,6 +82,18 @@ function get_php_classes($php_code) {
                 $class = getFullClass($tokens, $i, $count);
                 $classes[] = $class;
                 $i = $reset;
+            }elseif($current == T_CATCH){
+                while(++$i < $count){
+                    if(is_array($tokens[$i])){
+                        $current = $tokens[$i][0];
+                        if($current == T_STRING){
+                            $class = getFullClass($tokens, $i, $count);
+                            $classes[] = $class;
+                            --$i;
+                            break;
+                        }
+                    }
+                }
             }elseif($current == T_EXTENDS || $current == T_IMPLEMENTS){
                 while(++$i < $count){
                     if(is_array($tokens[$i])){
