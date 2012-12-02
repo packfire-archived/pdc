@@ -152,7 +152,8 @@ foreach ($iterator as $path) {
                 if(isset($index[$name])){
                     $used[$name] = true;
                     $resolved = $index[$name];
-                }elseif(substr($name, 0, 1) != '\\'){
+                }
+                if(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
                 }
                 if(!checkClassFile($resolved)){
