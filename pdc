@@ -29,17 +29,19 @@ if(PDC_AUTOLOAD){
 }
 
 function checkClassFile($namespace){
-    $autoloads = spl_autoload_functions();
-    if($autoloads){
-        foreach($autoloads as $autoload){
-            call_user_func($autoload, $namespace);
-            if(class_exists($namespace) || interface_exists($namespace)){
-                return true;
+    if(class_exists($namespace) || interface_exists($namespace)){
+        return true;
+    }else{
+        $autoloads = spl_autoload_functions();
+        if($autoloads){
+            foreach($autoloads as $autoload){
+                call_user_func($autoload, $namespace);
+                if(class_exists($namespace) || interface_exists($namespace)){
+                    return true;
+                }
             }
         }
         return false;
-    }else{
-        return class_exists($namespace) || interface_exists($namespace);
     }
 }
 
