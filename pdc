@@ -10,7 +10,7 @@
  */
 
 echo "Packfire Dependency Checker Tool
-Written by Sam-Mauris Yong v1.0.2\n\n";
+Written by Sam-Mauris Yong v1.0.3\n\n";
 
 $stats = array(
     'files' => 0,
