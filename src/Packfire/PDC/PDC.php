@@ -41,9 +41,14 @@ class PDC {
 	public function __construct($args){
 		$optionSet = new OptionSet($args);
 		$optionSet->addIndex(2, array($this, 'setAutoLoader'));
+		$optionSet->process();
 	}
 
 	public function run(){
+
+	}
+
+	public function check($file){
 
 	}
 
