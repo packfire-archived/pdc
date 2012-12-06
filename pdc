@@ -10,7 +10,7 @@
  */
 
 echo "Packfire Dependency Checker Tool
-Written by Sam-Mauris Yong v1.0.2\n\n";
+Written by Sam-Mauris Yong v1.0.3\n\n";
 
 $stats = array(
     'files' => 0,
@@ -23,9 +23,17 @@ $stats = array(
 define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PDC_DIR), RecursiveIteratorIterator::CHILD_FIRST);
 
+// checks if there is autoloader.
+// if there is autoloader, load it
 define('PDC_AUTOLOAD', isset($argv[2]) ? $argv[2] : '');
 if(PDC_AUTOLOAD){
     require PDC_AUTOLOAD;
+}elseif(is_file('vendor/autoload.php')){ // autodetect composer's autoloader
+    include('vendor/autoload.php');
+}
+
+function getClassNameFromNameSpace($namespace){
+    return ltrim(substr($namespace, strrpos($namespace, '\\')), '\\');
 }
 
 function checkClassFile($namespace){
@@ -78,6 +86,18 @@ function get_php_classes($php_code) {
                 $class = getFullClass($tokens, $i, $count);
                 $classes[] = $class;
                 $i = $reset;
+            }elseif($current == T_CATCH){
+                while(++$i < $count){
+                    if(is_array($tokens[$i])){
+                        $current = $tokens[$i][0];
+                        if($current == T_STRING || $current == T_NS_SEPARATOR){
+                            $class = getFullClass($tokens, $i, $count);
+                            $classes[] = $class;
+                            --$i;
+                            break;
+                        }
+                    }
+                }
             }elseif($current == T_EXTENDS || $current == T_IMPLEMENTS){
                 while(++$i < $count){
                     if(is_array($tokens[$i])){
@@ -153,6 +173,7 @@ foreach ($iterator as $path) {
                     $alias = substr($use['namespace'], $pos + 1);
                 }else{
                     $alias = $use['namespace'];
+                    $index[getClassNameFromNameSpace($alias)] = $alias;
                 }
                 $index[$alias] = $use['namespace'];
             }
