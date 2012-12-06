@@ -23,9 +23,13 @@ $stats = array(
 define('PDC_DIR', isset($argv[1]) ? $argv[1] : __DIR__);
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PDC_DIR), RecursiveIteratorIterator::CHILD_FIRST);
 
+// checks if there is autoloader.
+// if there is autoloader, load it
 define('PDC_AUTOLOAD', isset($argv[2]) ? $argv[2] : '');
 if(PDC_AUTOLOAD){
     require PDC_AUTOLOAD;
+}elseif(is_file('vendor/autoload.php')){ // autodetect composer's autoloader
+    include('vendor/autoload.php');
 }
 
 function getClassNameFromNameSpace($namespace){
