@@ -1,7 +1,7 @@
 <?php
 /**
  * Packfire Dependency Checker (pdc)
- * Written by Sam-Mauris Yong
+ * By Sam-Mauris Yong
  * 
  * Released open source under New BSD 3-Clause License.
  * Copyright (c) 2012, Sam-Mauris Yong Shan Xian <sam@mauris.sg>
@@ -21,5 +21,13 @@ namespace Packfire\PDC;
  * @link https://github.com/packfire/pdc/
  */
 class PDC{
+
+	public function __construct($args){
+
+	}
+
+	public function run(){
+
+	}
 
 }
