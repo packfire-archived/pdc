@@ -10,6 +10,8 @@
 
 namespace Packfire\PDC;
 
+use Packfire\Command\OptionSet;
+
 /**
  * The main PDC class for running and processing the source code
  * 
@@ -20,14 +22,37 @@ namespace Packfire\PDC;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class PDC{
+class PDC {
+
+	/**
+	 * Path to autoloader
+	 * @var string
+	 * @since 1.0.4
+	 */
+	private $autoloader;
+
+	/**
+	 * Path to source code folder
+	 * @var string
+	 * @since 1.0.4
+	 */
+	private $path;
 
 	public function __construct($args){
-
+		$optionSet = new OptionSet($args);
+		$optionSet->addIndex(2, array($this, 'setAutoLoader'));
 	}
 
 	public function run(){
 
+	}
+
+	public function setPath($path){
+		$this->path = $path;
+	}
+
+	public function setAutoLoader($autoLoader){
+		$this->autoLoader = $autoLoader;
 	}
 
 }
