@@ -30,13 +30,6 @@ class Analyzer {
 	private $tokens;
 
 	/**
-	 * The current processing token index
-	 * @var integer
-	 * @since 1.0.4
-	 */
-	private $current;
-
-	/**
 	 * The cache of number of tokens
 	 * @var integer
 	 * @since 1.0.4
@@ -51,6 +44,67 @@ class Analyzer {
 	public function __construct($source){
     	$this->tokens = token_get_all($php_code);
     	$this->count = count($tokens);
+	}
+
+	/**
+	 * Get all class names used in the source code
+	 * @return array Returns an array of string containing all the class names
+	 * @since 1.0.4
+	 */
+	public function classes(){
+	    $classes = array();
+	    $nextString = false;
+	    for ($current = 0; $current < $this->count; ++$current) {
+	        if(is_array($tokens[$current])){
+	            $current = $tokens[$current][0];
+	            if ($current == T_NEW || $current == T_INSTANCEOF) {
+	                $current += 2;
+	                $class = $this->fullClass($current);
+	                $classes[] = $class;
+	            }elseif($current == T_PAAMAYIM_NEKUDOTAYIM){
+	                $reset = $current;
+	                while($tokens[$current-1][0] == T_NS_SEPARATOR 
+	                	|| $tokens[$current-1][0] == T_STRING){
+	                    --$current;
+	                }
+	                $test = $current;
+	                $class = $this->fullClass($current);
+	                $classes[] = $class;
+	                $current = $reset;
+	            }elseif($current == T_CATCH){
+	                while(++$current < $this->count){
+	                    if(is_array($tokens[$current])){
+	                        $current = $tokens[$current][0];
+	                        if($current == T_STRING
+	                         || $current == T_NS_SEPARATOR){
+	                            $class = $this->fullClass($current);
+	                            $classes[] = $class;
+	                            --$current;
+	                            break;
+	                        }
+	                    }
+	                }
+	            }elseif($current == T_EXTENDS || $current == T_IMPLEMENTS){
+	                while(++$current < $this->count){
+	                    if(is_array($tokens[$current])){
+	                        $current = $tokens[$current][0];
+	                        if($current == T_STRING
+	                         || $current == T_NS_SEPARATOR){
+	                            $class = $this->fullClass($current);
+	                            $classes[] = $class;
+	                            --$current;
+	                        }elseif($current == T_IMPLEMENTS){
+	                            --$current;
+	                            break;
+	                        }
+	                    }elseif($tokens[$current] == '{'){
+	                        break;
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    return $classes;
 	}
 
 	/**
