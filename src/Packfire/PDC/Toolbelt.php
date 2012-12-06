@@ -22,4 +22,14 @@ namespace Packfire\PDC;
  */
 class Toolbelt {
 
+	/**
+	 * Get the class name from the entire namespace
+	 * @param string $namespace The full namespace to extract the class name
+	 * @return string Returns the class name extracted from the namespace
+	 * @since 1.0.4
+	 */
+	public static function classFromNamespace($namespace){
+	    return ltrim(substr($namespace, strrpos($namespace, '\\')), '\\');
+	}
+
 }
