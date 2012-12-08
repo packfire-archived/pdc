@@ -28,7 +28,7 @@ class Report {
 		if($index instanceof Index){
 			$this->indexes[$key] = $index;
 		}else{
-			throw new InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
+			throw new \InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
 		}
 	}
 
@@ -36,7 +36,7 @@ class Report {
 		if(isset($this->indexes[$key])){
 			$this->indexes[$key]->increment();
 		}else{
-			throw new Exception($key . ' index not found in report.');
+			throw new \Exception($key . ' index not found in report.');
 		}
 	}
 	
