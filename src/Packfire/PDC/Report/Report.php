@@ -22,5 +22,22 @@ namespace Packfire\PDC\Report;
  */
 class Report {
 
+	private $indexes = array();
+
+	public function add($key, $index){
+		if($index instanceof Index){
+			$this->indexes[$key] = $index;
+		}else{
+			throw new InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
+		}
+	}
+
+	public function increment($key){
+		if(isset($this->indexes[$key])){
+			$this->indexes[$key]->increment();
+		}else{
+			throw new Exception($key . ' index not found in report.');
+		}
+	}
 	
 }
