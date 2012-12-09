@@ -66,7 +66,7 @@ class Analyzer {
         }
         $this->source = file_get_contents((string) $this->info);
         $this->tokens = token_get_all($this->source);
-        $this->count = count($tokens);
+        $this->count = count($this->tokens);
     }
 
     protected function checkMismatch($name) {
