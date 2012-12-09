@@ -70,7 +70,7 @@ class Analyzer {
 
 	protected function checkMismatch(){
         $name = $this->info->getBasename('.php');
-        return (bool)preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0);
+        return (bool)preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0;
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Analyzer {
 	 */
 	public function analyze($report){
         $index = array();
-        
+
 		$report->processFile((string)$this->info);
 		if(!$this->checkMismatch()){
 			$report->increment(ReportType::MISMATCH);

@@ -48,9 +48,9 @@ class PDC {
 	}
 
 	public function run(){
-		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator($this->path),
-			 RecursiveIteratorIterator::CHILD_FIRST);
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator($this->path),
+			 \RecursiveIteratorIterator::CHILD_FIRST);
 		if($this->autoloader){
 		    require $this->autoloader;
 		}elseif(is_file('vendor/autoload.php')){ // autodetect composer's autoloader
