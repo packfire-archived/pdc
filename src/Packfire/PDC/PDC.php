@@ -57,6 +57,7 @@ class PDC {
     public function run() {
         echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
 
+        $startTime = microtime(true);
         $iterator = new \RecursiveIteratorIterator(
                         new \RecursiveDirectoryIterator($this->path),
                         \RecursiveIteratorIterator::CHILD_FIRST);
@@ -82,6 +83,8 @@ class PDC {
         }
 
         echo $report->report();
+        $timeTaken = microtime(true) - $startTime;
+        echo 'Time: ' . sigFig($timeTaken, 5) . " seconds\n";
         echo "-- PDC Complete --\n";
     }
 
