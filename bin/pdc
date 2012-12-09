@@ -11,3 +11,8 @@
  */
 
 require('../src/Packfire/PDC/Bootstrap.php');
+
+use Packfire\PDC\PDC;
+
+$pdc = new PDC($_SERVER['argv']);
+$pdc->run();
