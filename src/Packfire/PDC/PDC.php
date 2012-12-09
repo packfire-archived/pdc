@@ -26,7 +26,13 @@ use Packfire\PDC\Report\Index as ReportIndex;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
+
 class PDC {
+
+    /**
+     * Version of PDC
+     */
+    const VERSION = '{{version}}';
 
     /**
      * Path to autoloader
@@ -49,6 +55,8 @@ class PDC {
     }
 
     public function run() {
+        echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
+
         $iterator = new \RecursiveIteratorIterator(
                         new \RecursiveDirectoryIterator($this->path),
                         \RecursiveIteratorIterator::CHILD_FIRST);
@@ -74,6 +82,7 @@ class PDC {
         }
 
         echo $report->report();
+        echo "-- PDC Complete --\n";
     }
 
     public function setPath($path) {
