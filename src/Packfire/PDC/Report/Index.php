@@ -28,7 +28,7 @@ class Index {
 
 	private $message;
 
-	public function __construct($summary, $message){
+	public function __construct($summary, $message = null){
 		$this->summary = $summary;
 		$this->message = $message;
 	}

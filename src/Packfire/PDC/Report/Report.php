@@ -58,7 +58,9 @@ class Report {
 		foreach($this->files as $file => $details){
 			$buffer .= "[$file]:\n";
 			foreach($details as $text){
-				$buffer .= "$text\n";
+				if($text){
+					$buffer .= "$text\n";
+				}
 			}
 			$buffer .= "\n";
 		}
