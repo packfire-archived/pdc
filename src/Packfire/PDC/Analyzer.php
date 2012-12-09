@@ -148,7 +148,8 @@ class Analyzer {
 
     protected function useIndexing() {
         $index = array();
-        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $contents, $uses, PREG_SET_ORDER);
+        $uses = array();
+        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $this->source, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             if (isset($use['alias'])) {
                 $index[$use['alias']] = $use['namespace'];
