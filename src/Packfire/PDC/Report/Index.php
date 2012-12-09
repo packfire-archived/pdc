@@ -86,8 +86,8 @@ class Index {
      * @return integer Returns the counter
      * @since 1.0.4
      */
-    public function counter(){
-        return $this->counter;
+    public function count(){
+        return $this->count;
     }
 	
 }

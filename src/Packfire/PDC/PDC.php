@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
@@ -27,60 +28,60 @@ use Packfire\PDC\Report\Index as ReportIndex;
  */
 class PDC {
 
-	/**
-	 * Path to autoloader
-	 * @var string
-	 * @since 1.0.4
-	 */
-	private $autoloader;
+    /**
+     * Path to autoloader
+     * @var string
+     * @since 1.0.4
+     */
+    private $autoloader;
 
-	/**
-	 * Path to source code folder
-	 * @var string
-	 * @since 1.0.4
-	 */
-	private $path;
+    /**
+     * Path to source code folder
+     * @var string
+     * @since 1.0.4
+     */
+    private $path;
 
-	public function __construct($args){
-		$optionSet = new OptionSet($args);
-		$optionSet->addIndex(2, array($this, 'setAutoLoader'));
-		$optionSet->process();
-	}
+    public function __construct($args) {
+        $optionSet = new OptionSet($args);
+        $optionSet->addIndex(2, array($this, 'setAutoLoader'));
+        $optionSet->process();
+    }
 
-	public function run(){
-		$iterator = new \RecursiveIteratorIterator(
-			new \RecursiveDirectoryIterator($this->path),
-			 \RecursiveIteratorIterator::CHILD_FIRST);
-		if($this->autoloader){
-		    require $this->autoloader;
-		}elseif(is_file('vendor/autoload.php')){ // autodetect composer's autoloader
-		    include('vendor/autoload.php');
-		}
+    public function run() {
+        $iterator = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($this->path),
+                        \RecursiveIteratorIterator::CHILD_FIRST);
+        if ($this->autoloader) {
+            require $this->autoloader;
+        } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
+            include('vendor/autoload.php');
+        }
 
-		$report = new Report();
-		$report->add(ReportType::FILE, new ReportIndex('%d files checked'));
-		$report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
-		$report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
-		$report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
-		$report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
+        $report = new Report();
+        $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
+        $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
+        $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
+        $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
+        $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
 
-		foreach ($iterator as $path) {
-		    $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
-		    if ($path->isFile() && $extension == 'php') {
-		    	$analyzer = new Analyzer($path);
-		    	$analyzer->analyze($report);
-		    }
-		}
+        foreach ($iterator as $path) {
+            $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
+            if ($path->isFile() && $extension == 'php') {
+                $analyzer = new Analyzer($path);
+                $analyzer->analyze($report);
+            }
+        }
 
-		echo $report->report();
-	}
+        echo $report->report();
+    }
 
-	public function setPath($path){
-		$this->path = $path;
-	}
+    public function setPath($path) {
+        $this->path = $path;
+    }
 
-	public function setAutoLoader($autoloader){
-		$this->autoloader = $autoloader;
-	}
+    public function setAutoLoader($autoloader) {
+        $this->autoloader = $autoloader;
+    }
 
 }

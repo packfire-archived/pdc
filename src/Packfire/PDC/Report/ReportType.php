@@ -22,10 +22,10 @@ namespace Packfire\PDC\Report;
  */
 class ReportType {
 
-	const FILE = 100;
-	const MISMATCH = 200;
-	const NO_NAMESPACE = 300;
-	const NOT_FOUND = 400;
-	const UNUSED = 500;
+    const FILE = 100;
+    const MISMATCH = 200;
+    const NO_NAMESPACE = 300;
+    const NOT_FOUND = 400;
+    const UNUSED = 500;
 	
 }

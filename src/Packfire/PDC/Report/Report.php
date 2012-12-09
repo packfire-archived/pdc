@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
@@ -22,58 +23,56 @@ namespace Packfire\PDC\Report;
  */
 class Report {
 
-	private $indexes = array();
+    private $indexes = array();
+    private $files = array();
+    private $currentFile;
 
-	private $files = array();
+    public function add($key, $index) {
+        if ($index instanceof Index) {
+            $this->indexes[$key] = $index;
+        } else {
+            throw new \InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
+        }
+    }
 
-	private $currentFile;
+    public function processFile($file) {
+        $this->currentFile = $file;
+        $this->files[$this->currentFile] = array();
+    }
 
-	public function add($key, $index){
-		if($index instanceof Index){
-			$this->indexes[$key] = $index;
-		}else{
-			throw new \InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
-		}
-	}
+    public function increment($key, $details = null) {
+        if (isset($this->indexes[$key])) {
+            $index = $this->indexes[$key];
+            $index->increment();
+            if ($this->currentFile) {
+                $this->files[$this->currentFile][] = $index->message() . ($details ? ': ' . $details : '');
+            }
+        } else {
+            throw new \Exception($key . ' index not found in report.');
+        }
+    }
 
-	public function processFile($file){
-		$this->currentFile = $file;
-		$this->files[$this->currentFile] = array();
-	}
+    public function report() {
+        $buffer = '';
+        foreach ($this->files as $file => $details) {
+            $buffer .= "[$file]:\n";
+            foreach ($details as $text) {
+                if ($text) {
+                    $buffer .= "$text\n";
+                }
+            }
+            $buffer .= "\n";
+        }
 
-	public function increment($key, $details = null){
-		if(isset($this->indexes[$key])){
-			$index = $this->indexes[$key];
-			$index->increment();
-			if($this->currentFile){
-				$this->files[$this->currentFile][] = $index->message() . ($details ? ': ' . $details : '');
-			}
-		}else{
-			throw new \Exception($key . ' index not found in report.');
-		}
-	}
+        $buffer .= "-Summary-\n";
+        foreach ($indexes as $index) {
+            if ($index->count() > 0) {
+                $buffer .= $index->summary() . "\n";
+            }
+        }
+        $buffer .= "\n";
 
-	public function report(){
-		$buffer = '';
-		foreach($this->files as $file => $details){
-			$buffer .= "[$file]:\n";
-			foreach($details as $text){
-				if($text){
-					$buffer .= "$text\n";
-				}
-			}
-			$buffer .= "\n";
-		}
+        return $buffer;
+    }
 
-		$buffer .= "-Summary-\n";
-		foreach($indexes as $index){
-			if($index->count() > 0){
-				$buffer .= $index->summary() . "\n";
-			}
-		}
-		$buffer .= "\n";
-
-		return $buffer;
-	}
-	
 }
