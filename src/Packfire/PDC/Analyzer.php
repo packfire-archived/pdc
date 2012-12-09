@@ -52,12 +52,16 @@ class Analyzer {
 
 	/**
 	 * Create a new Analyzer object
-	 * @param string $file Path name to the PHP file to analyze
+	 * @param string|\SplFileInfo $file Path name to the PHP file to analyze
 	 * @since 1.0.4
 	 */
 	public function __construct($file){
-		$this->info = new \SplFileInfo($file);
-		$this->source = file_get_contents($file);
+		if($file instanceof \SplFileInfo){
+			$this->info = $file;
+		}else{
+			$this->info = new \SplFileInfo($file);
+		}
+		$this->source = file_get_contents((string)$this->info);
     	$this->tokens = token_get_all($this->source);
     	$this->count = count($tokens);
 	}
