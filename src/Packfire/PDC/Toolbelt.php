@@ -32,4 +32,22 @@ class Toolbelt {
         return ltrim(substr($namespace, strrpos($namespace, '\\')), '\\');
     }
 
+    /**
+     * Round a number to a certain significant number
+     * @param integer|double $value The value to round
+     * @param integer $sigFigs The number of significant numbers
+     * @return double Returns the number rounded
+     * @since 1.0.4
+     */
+    public static function significantFigure($value, $sigFigs = 3){
+        //convert to scientific notation e.g. 12345 -> 1.2345x10^4
+        //where $significand is 1.2345 and $exponent is 4
+        $exponent = floor(log10(abs($value))+1);
+        $significand = round(($value
+            / pow(10, $exponent))
+            * pow(10, $sigFigs))
+            / pow(10, $sigFigs);
+        return $significand * pow(10, $exponent);
+    }
+
 }

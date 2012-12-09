@@ -41,4 +41,13 @@ class ToolbeltTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Hurray', Toolbelt::classFromNamespace('Hurray'));
     }
 
+    /**
+     * @covers Packfire\PDC\Toolbelt::significantFigure
+     */
+    public function testSignificantFigures() {
+        $this->assertEquals(1.5, Toolbelt::significantFigure(1.5323, 2));
+        $this->assertEquals(1.53, Toolbelt::significantFigure(1.5323));
+        $this->assertEquals(153, Toolbelt::significantFigure(153.23));
+    }
+
 }
