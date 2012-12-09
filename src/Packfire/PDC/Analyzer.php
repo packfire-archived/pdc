@@ -23,6 +23,20 @@ namespace Packfire\PDC;
 class Analyzer {
 
 	/**
+	 * The file info object
+	 * @var SplFileInfo
+	 * @since 1.0.4
+	 */
+	private $info;
+
+	/**
+	 * Original PHP source code
+	 * @var array
+	 * @since 1.0.4
+	 */
+	private $source;
+
+	/**
 	 * PHP source code tokens
 	 * @var array
 	 * @since 1.0.4
@@ -38,11 +52,13 @@ class Analyzer {
 
 	/**
 	 * Create a new Analyzer object
-	 * @param string $source The source code to analyze
+	 * @param string $file Path name to the PHP file to analyze
 	 * @since 1.0.4
 	 */
-	public function __construct($source){
-    	$this->tokens = token_get_all($php_code);
+	public function __construct($file){
+		$this->info = new \SplFileInfo($file);
+		$this->source = file_get_contents($file);
+    	$this->tokens = token_get_all($this->source);
     	$this->count = count($tokens);
 	}
 
