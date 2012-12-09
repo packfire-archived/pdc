@@ -88,7 +88,6 @@ class Analyzer {
 	 * @since 1.0.4
 	 */
 	public function analyze($report){
-        $index = array();
 
 		$report->processFile((string)$this->info);
         $className = $this->info->getBasename('.php');
@@ -100,6 +99,28 @@ class Analyzer {
 		if(!$namespace){
 			$report->increment(ReportType::NO_NAMESPACE);
 		}
+
+		$index = $this->useIndexing();
+
+	}
+
+	protected function useIndexing(){
+        $index = array();
+        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $contents, $uses, PREG_SET_ORDER);
+        foreach($uses as $use){
+            if(isset($use['alias'])){
+                $index[$use['alias']] = $use['namespace'];
+            }else{
+                if(false !== $pos = strrpos($use['namespace'], '\\')){
+                    $alias = substr($use['namespace'], $pos + 1);
+                }else{
+                    $alias = $use['namespace'];
+                    $index[Toolbelt::classFromNamespace($alias)] = $alias;
+                }
+                $index[$alias] = $use['namespace'];
+            }
+        }
+        return $index;
 	}
 
 	/**
