@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
