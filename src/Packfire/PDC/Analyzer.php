@@ -131,16 +131,16 @@ class Analyzer {
     public function classes() {
         $classes = array();
         for ($current = 0; $current < $this->count; ++$current) {
-            if (is_array($tokens[$current])) {
-                $current = $tokens[$current][0];
+            if (is_array($this->tokens[$current])) {
+                $current = $this->tokens[$current][0];
                 if ($current == T_NEW || $current == T_INSTANCEOF) {
                     $current += 2;
                     $class = $this->fullClass($current);
                     $classes[] = $class;
                 } elseif ($current == T_PAAMAYIM_NEKUDOTAYIM) {
                     $reset = $current;
-                    while ($tokens[$current - 1][0] == T_NS_SEPARATOR
-                    || $tokens[$current - 1][0] == T_STRING) {
+                    while ($this->tokens[$current - 1][0] == T_NS_SEPARATOR
+                    || $this->tokens[$current - 1][0] == T_STRING) {
                         --$current;
                     }
                     $class = $this->fullClass($current);
@@ -148,8 +148,8 @@ class Analyzer {
                     $current = $reset;
                 } elseif ($current == T_CATCH) {
                     while (++$current < $this->count) {
-                        if (is_array($tokens[$current])) {
-                            $current = $tokens[$current][0];
+                        if (is_array($this->tokens[$current])) {
+                            $current = $this->tokens[$current][0];
                             if ($current == T_STRING
                                     || $current == T_NS_SEPARATOR) {
                                 $class = $this->fullClass($current);
@@ -161,8 +161,8 @@ class Analyzer {
                     }
                 } elseif ($current == T_EXTENDS || $current == T_IMPLEMENTS) {
                     while (++$current < $this->count) {
-                        if (is_array($tokens[$current])) {
-                            $current = $tokens[$current][0];
+                        if (is_array($this->tokens[$current])) {
+                            $current = $this->tokens[$current][0];
                             if ($current == T_STRING
                                     || $current == T_NS_SEPARATOR) {
                                 $class = $this->fullClass($current);
@@ -172,7 +172,7 @@ class Analyzer {
                                 --$current;
                                 break;
                             }
-                        } elseif ($tokens[$current] == '{') {
+                        } elseif ($this->tokens[$current] == '{') {
                             break;
                         }
                     }
