@@ -87,7 +87,7 @@ class Analyzer {
     }
 
     protected function checkMismatch($name) {
-        return (bool) preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0;
+        return preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 1;
     }
 
     protected function fetchNamespace() {
@@ -133,6 +133,7 @@ class Analyzer {
      */
     public function analyze($report) {
         $report->processFile((string) $this->info);
+        $report->increment(ReportType::FILE);
         $className = $this->info->getBasename('.php');
         if (!$this->checkMismatch($className)) {
             $report->increment(ReportType::MISMATCH, $className);
@@ -178,7 +179,7 @@ class Analyzer {
                 $current = $this->tokens[$idx][0];
                 if ($current == T_NEW || $current == T_INSTANCEOF) {
                     $idx += 2;
-                    $class = $this->fullClass($current);
+                    $class = $this->fullClass($idx);
                     $classes[] = $class;
                 } elseif ($current == T_PAAMAYIM_NEKUDOTAYIM) {
                     $reset = $idx;
