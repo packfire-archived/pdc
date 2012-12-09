@@ -11,3 +11,8 @@
  */
 
 require('../src/Packfire/PDC/Bootstrap.php');
+
+use Packfire\PDC\Compiler;
+
+$pdc = new Compiler();
+$pdc->compile();

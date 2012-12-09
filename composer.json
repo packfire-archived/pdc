@@ -28,7 +28,8 @@
     },
     "require":{
         "php": ">=5.3.0",
-        "packfire/options": "1.0.*"
+        "packfire/options": "1.0.*",
+        "symfony/process": "2.1.*"
     },
     "autoload": {
         "psr-0": {"Packfire": "src/"}
