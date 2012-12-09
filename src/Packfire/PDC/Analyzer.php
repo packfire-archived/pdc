@@ -69,7 +69,7 @@ class Analyzer {
         $this->count = count($this->tokens);
     }
 
-    protected function checkClassExists($namespace){
+    protected static function checkClassExists($namespace){
         if(class_exists($namespace) || interface_exists($namespace)){
             return true;
         }else{
@@ -113,7 +113,7 @@ class Analyzer {
                 }elseif(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
                 }
-                if(!checkClassFile($resolved)){
+                if(!self::checkClassExists($resolved)){
                     $report->increment(ReportType::NOT_FOUND, $resolved);
                 }
             }
@@ -173,49 +173,49 @@ class Analyzer {
      */
     public function classes() {
         $classes = array();
-        for ($current = 0; $current < $this->count; ++$current) {
-            if (is_array($this->tokens[$current])) {
-                $current = $this->tokens[$current][0];
+        for ($idx = 0; $idx < $this->count; ++$idx) {
+            if (is_array($this->tokens[$idx])) {
+                $current = $this->tokens[$idx][0];
                 if ($current == T_NEW || $current == T_INSTANCEOF) {
-                    $current += 2;
+                    $idx += 2;
                     $class = $this->fullClass($current);
                     $classes[] = $class;
                 } elseif ($current == T_PAAMAYIM_NEKUDOTAYIM) {
-                    $reset = $current;
-                    while ($this->tokens[$current - 1][0] == T_NS_SEPARATOR
-                    || $this->tokens[$current - 1][0] == T_STRING) {
-                        --$current;
+                    $reset = $idx;
+                    while ($this->tokens[$idx - 1][0] == T_NS_SEPARATOR
+                    || $this->tokens[$idx - 1][0] == T_STRING) {
+                        --$idx;
                     }
-                    $class = $this->fullClass($current);
+                    $class = $this->fullClass($idx);
                     $classes[] = $class;
-                    $current = $reset;
+                    $idx = $reset;
                 } elseif ($current == T_CATCH) {
-                    while (++$current < $this->count) {
-                        if (is_array($this->tokens[$current])) {
-                            $current = $this->tokens[$current][0];
+                    while (++$idx < $this->count) {
+                        if (is_array($this->tokens[$idx])) {
+                            $current = $this->tokens[$idx][0];
                             if ($current == T_STRING
                                     || $current == T_NS_SEPARATOR) {
-                                $class = $this->fullClass($current);
+                                $class = $this->fullClass($idx);
                                 $classes[] = $class;
-                                --$current;
+                                --$idx;
                                 break;
                             }
                         }
                     }
                 } elseif ($current == T_EXTENDS || $current == T_IMPLEMENTS) {
-                    while (++$current < $this->count) {
-                        if (is_array($this->tokens[$current])) {
-                            $current = $this->tokens[$current][0];
+                    while (++$idx < $this->count) {
+                        if (is_array($this->tokens[$idx])) {
+                            $current = $this->tokens[$idx][0];
                             if ($current == T_STRING
                                     || $current == T_NS_SEPARATOR) {
-                                $class = $this->fullClass($current);
+                                $class = $this->fullClass($idx);
                                 $classes[] = $class;
-                                --$current;
+                                --$idx;
                             } elseif ($current == T_IMPLEMENTS) {
-                                --$current;
+                                --$idx;
                                 break;
                             }
-                        } elseif ($this->tokens[$current] == '{') {
+                        } elseif ($this->tokens[$idx] == '{') {
                             break;
                         }
                     }
