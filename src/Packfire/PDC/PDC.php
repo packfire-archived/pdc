@@ -49,9 +49,10 @@ class PDC {
     private $path;
 
     public function __construct($args) {
-        $optionSet = new OptionSet($args);
+        $optionSet = new OptionSet();
         $optionSet->addIndex(2, array($this, 'setAutoLoader'));
-        $optionSet->process();
+        $optionSet->addIndex(1, array($this, 'setPath'));
+        $optionSet->parse($args);
     }
 
     public function run() {
