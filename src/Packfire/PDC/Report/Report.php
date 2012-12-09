@@ -24,6 +24,10 @@ class Report {
 
 	private $indexes = array();
 
+	private $files = array();
+
+	private $currentFile;
+
 	public function add($key, $index){
 		if($index instanceof Index){
 			$this->indexes[$key] = $index;
@@ -32,9 +36,18 @@ class Report {
 		}
 	}
 
-	public function increment($key){
+	public function processFile($file){
+		$this->currentFile = $file;
+		$this->files[$this->currentFile] = array();
+	}
+
+	public function increment($key, $details = null){
 		if(isset($this->indexes[$key])){
-			$this->indexes[$key]->increment();
+			$index = $this->indexes[$key];
+			$index->increment();
+			if($this->currentFile){
+				$this->files[$this->currentFile][] = $index->message() . ($details ? ': ' . $details : '');
+			}
 		}else{
 			throw new \Exception($key . ' index not found in report.');
 		}
