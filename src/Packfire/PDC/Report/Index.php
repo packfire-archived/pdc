@@ -22,31 +22,31 @@ namespace Packfire\PDC\Report;
  */
 class Index {
 
-	private $counter = 0;
+    private $counter = 0;
 
-	private $summary;
+    private $summary;
 
-	private $message;
+    private $message;
 
-	public function __construct($summary, $message = null){
-		$this->summary = $summary;
-		$this->message = $message;
-	}
+    public function __construct($summary, $message = null){
+        $this->summary = $summary;
+        $this->message = $message;
+    }
 
-	public function increment(){
-		++$this->counter;
-	}
+    public function increment(){
+        ++$this->counter;
+    }
 
-	public function summary(){
-		return sprintf($this->summary, $this->counter);
-	}
+    public function summary(){
+        return sprintf($this->summary, $this->counter);
+    }
 
-	public function message(){
-		return $this->message;
-	}
+    public function message(){
+        return $this->message;
+    }
 
-	public function counter(){
-		return $this->counter;
-	}
+    public function counter(){
+        return $this->counter;
+    }
 	
 }
