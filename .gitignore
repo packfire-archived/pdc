@@ -2,7 +2,7 @@
 *.bak
 Thumbs.db
 desktop.ini
-composer.lock
 vendor
 composer.phar
+pdc.phar
 phpunit.xml
