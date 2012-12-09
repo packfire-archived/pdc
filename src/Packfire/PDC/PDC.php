@@ -45,19 +45,22 @@ class PDC {
 	}
 
 	public function run(){
-
-	}
-
-	public function check($file){
-
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($this->path),
+			 RecursiveIteratorIterator::CHILD_FIRST);
+		if($this->autoloader){
+		    require $this->autoloader;
+		}elseif(is_file('vendor/autoload.php')){ // autodetect composer's autoloader
+		    include('vendor/autoload.php');
+		}
 	}
 
 	public function setPath($path){
 		$this->path = $path;
 	}
 
-	public function setAutoLoader($autoLoader){
-		$this->autoLoader = $autoLoader;
+	public function setAutoLoader($autoloader){
+		$this->autoloader = $autoloader;
 	}
 
 }
