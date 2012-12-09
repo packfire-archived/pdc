@@ -87,7 +87,7 @@ class Index implements \Countable {
      * @since 1.0.4
      */
     public function count(){
-        return $this->count;
+        return $this->counter;
     }
 	
 }
