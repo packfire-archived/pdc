@@ -67,6 +67,14 @@ class Analyzer {
 	}
 
 	/**
+	 * Perform analysis on the file
+	 * @param \Packfire\PDC\Report\Report $report The report to be generated later
+	 * @since 1.0.4
+	 */
+	public function analyze($report){
+	}
+
+	/**
 	 * Get all class names used in the source code
 	 * @return array Returns an array of string containing all the class names
 	 * @since 1.0.4
@@ -134,7 +142,7 @@ class Analyzer {
 	 * @return string Returns the full namespace or classname read
 	 * @since 1.0.4
 	 */
-	private function fullClass(&$start){
+	protected function fullClass(&$start){
 	    $class = '';
 	    do{
 	        if(is_array($this->tokens[$start])){
