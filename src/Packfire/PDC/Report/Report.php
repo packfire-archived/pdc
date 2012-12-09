@@ -52,5 +52,26 @@ class Report {
 			throw new \Exception($key . ' index not found in report.');
 		}
 	}
+
+	public function report(){
+		$buffer = '';
+		foreach($this->files as $file => $details){
+			$buffer .= "[$file]:\n";
+			foreach($details as $text){
+				$buffer .= "$text\n";
+			}
+			$buffer .= "\n";
+		}
+
+		$buffer .= "-Summary-\n";
+		foreach($indexes as $index){
+			if($index->count() > 0){
+				$buffer .= $index->summary() . "\n";
+			}
+		}
+		$buffer .= "\n";
+
+		return $buffer;
+	}
 	
 }
