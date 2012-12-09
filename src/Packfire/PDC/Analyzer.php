@@ -68,9 +68,18 @@ class Analyzer {
     	$this->count = count($tokens);
 	}
 
-	protected function checkMismatch(){
-        $name = $this->info->getBasename('.php');
+	protected function checkMismatch($name){
         return (bool)preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0;
+	}
+
+	protected function fetchNamespace(){
+		$namespace = '';
+        if(preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $this->source, $namespace)){
+            $namespace = $namespace['namespace'];
+        }else{
+        	$namespace = '';
+        }
+        return $namespace;
 	}
 
 	/**
@@ -82,8 +91,14 @@ class Analyzer {
         $index = array();
 
 		$report->processFile((string)$this->info);
-		if(!$this->checkMismatch()){
-			$report->increment(ReportType::MISMATCH);
+        $className = $this->info->getBasename('.php');
+		if(!$this->checkMismatch($className)){
+			$report->increment(ReportType::MISMATCH, $className);
+		}
+
+		$namespace = $this->fetchNamespace();
+		if(!$namespace){
+			$report->increment(ReportType::NO_NAMESPACE);
 		}
 	}
 
