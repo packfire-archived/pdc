@@ -65,7 +65,7 @@ class Report {
         }
 
         $buffer .= "-Summary-\n";
-        foreach ($indexes as $index) {
+        foreach ($this->indexes as $index) {
             if ($index->count() > 0) {
                 $buffer .= $index->summary() . "\n";
             }
