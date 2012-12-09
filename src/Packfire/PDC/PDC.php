@@ -46,7 +46,7 @@ class PDC {
      * @var string
      * @since 1.0.4
      */
-    private $path;
+    private $path = __DIR__;
 
     public function __construct($args) {
         $optionSet = new OptionSet();
