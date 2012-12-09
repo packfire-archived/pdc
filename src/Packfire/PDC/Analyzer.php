@@ -69,6 +69,23 @@ class Analyzer {
         $this->count = count($this->tokens);
     }
 
+    protected function checkClassExists($namespace){
+        if(class_exists($namespace) || interface_exists($namespace)){
+            return true;
+        }else{
+            $autoloads = spl_autoload_functions();
+            if($autoloads){
+                foreach($autoloads as $autoload){
+                    call_user_func($autoload, $namespace);
+                    if(class_exists($namespace) || interface_exists($namespace)){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
     protected function checkMismatch($name) {
         return (bool) preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0;
     }
@@ -83,13 +100,38 @@ class Analyzer {
         return $namespace;
     }
 
+    public function checkClasses($report){
+        $index = $this->useIndexing();
+        $classes = $this->classes();
+        $used = array();
+        foreach($classes as $name){
+            if(!preg_match('`(parent|self|static|^\$)`', $name)){
+                $resolved = $name;
+                if(isset($index[$name])){
+                    $used[$name] = true;
+                    $resolved = $index[$name];
+                }elseif(substr($name, 0, 1) != '\\'){
+                    $resolved = $namespace . '\\' . $name;
+                }
+                if(!checkClassFile($resolved)){
+                    $report->increment(ReportType::NOT_FOUND, $resolved);
+                }
+            }
+        }
+        $diff = array_diff(array_keys($index), array_keys($used));
+        if(count($diff) > 0){
+            foreach($diff as $unused){
+                $report->increment(ReportType::UNUSED, $unused);
+            }
+        }
+    }
+
     /**
      * Perform analysis on the file
      * @param \Packfire\PDC\Report\Report $report The report to be generated later
      * @since 1.0.4
      */
     public function analyze($report) {
-
         $report->processFile((string) $this->info);
         $className = $this->info->getBasename('.php');
         if (!$this->checkMismatch($className)) {
@@ -101,7 +143,7 @@ class Analyzer {
             $report->increment(ReportType::NO_NAMESPACE);
         }
 
-        $index = $this->useIndexing();
+        $this->checkClasses($report);
     }
 
     protected function useIndexing() {
@@ -185,7 +227,7 @@ class Analyzer {
     /**
      * Get the full namespace / classname
      * @param integer &$start (reference) The start index to read
-     * 		 the Namespace/Classname from
+     *       the Namespace/Classname from
      * @return string Returns the full namespace or classname read
      * @since 1.0.4
      */
