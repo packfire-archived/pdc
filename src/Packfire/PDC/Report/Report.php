@@ -55,13 +55,14 @@ class Report {
     public function report() {
         $buffer = '';
         foreach ($this->files as $file => $details) {
-            $buffer .= "[$file]:\n";
-            foreach ($details as $text) {
-                if ($text) {
+            $details = array_filter($details);
+            if(count($details) > 0){
+                $buffer .= "[$file]:\n";
+                foreach ($details as $text) {
                     $buffer .= "$text\n";
                 }
+                $buffer .= "\n";
             }
-            $buffer .= "\n";
         }
 
         $buffer .= "-Summary-\n";
