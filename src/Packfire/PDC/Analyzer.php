@@ -10,6 +10,8 @@
 
 namespace Packfire\PDC;
 
+use Packfire\PDC\Report\ReportType;
+
 /**
  * Analyzes source code for namespace, class declaration and usage
  * 
@@ -66,12 +68,23 @@ class Analyzer {
     	$this->count = count($tokens);
 	}
 
+	protected function checkMismatch(){
+        $name = $this->info->getBasename('.php');
+        return (bool)preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 0);
+	}
+
 	/**
 	 * Perform analysis on the file
 	 * @param \Packfire\PDC\Report\Report $report The report to be generated later
 	 * @since 1.0.4
 	 */
 	public function analyze($report){
+        $index = array();
+        
+		$report->processFile((string)$this->info);
+		if(!$this->checkMismatch()){
+			$report->increment(ReportType::MISMATCH);
+		}
 	}
 
 	/**
