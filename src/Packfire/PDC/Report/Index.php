@@ -22,29 +22,70 @@ namespace Packfire\PDC\Report;
  */
 class Index {
 
+    /**
+     * The counter of the index
+     * @var integer
+     * @since 1.0.4
+     */
     private $counter = 0;
 
+    /**
+     * The summary text to be displayed at the summary
+     * '%d' denotes where the counter number will appear
+     * @var string
+     * @since 1.0.4
+     */
     private $summary;
 
+    /**
+     * Message to show whenever an instance occur
+     * @var string
+     * @since 1.0.4
+     */
     private $message;
 
+    /**
+     * Create a new Index object
+     * @param string $summary The summary string to display at summary
+     * @param string $message (optional) Detailed message of the index
+     * @since 1.0.4
+     */
     public function __construct($summary, $message = null){
         $this->summary = $summary;
         $this->message = $message;
     }
 
+    /**
+     * Add to the counter
+     * @since 1.0.4
+     */
     public function increment(){
         ++$this->counter;
     }
 
+    /**
+     * Get the formatted summary
+     * @return string Returns the summary
+     * @since 1.0.4
+     */
     public function summary(){
         return sprintf($this->summary, $this->counter);
     }
 
+    /**
+     * Get the message string
+     * @return string Returns the message string
+     * @since 1.0.4
+     */
     public function message(){
         return $this->message;
     }
 
+    /**
+     * Get the index counter
+     * @return integer Returns the counter
+     * @since 1.0.4
+     */
     public function counter(){
         return $this->counter;
     }
