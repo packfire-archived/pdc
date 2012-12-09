@@ -100,7 +100,7 @@ class Analyzer {
         return $namespace;
     }
 
-    public function checkClasses($report){
+    public function checkClasses($namespace, $report){
         $index = $this->useIndexing();
         $classes = $this->classes();
         $used = array();
@@ -143,7 +143,7 @@ class Analyzer {
             $report->increment(ReportType::NO_NAMESPACE);
         }
 
-        $this->checkClasses($report);
+        $this->checkClasses($namespace, $report);
     }
 
     protected function useIndexing() {
