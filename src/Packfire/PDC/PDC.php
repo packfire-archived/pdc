@@ -12,6 +12,7 @@
 namespace Packfire\PDC;
 
 use Packfire\Command\OptionSet;
+use Packfire\PDC\Toolbelt;
 use Packfire\PDC\Report\Report;
 use Packfire\PDC\Report\ReportType;
 use Packfire\PDC\Report\Index as ReportIndex;
@@ -85,7 +86,7 @@ class PDC {
 
         echo $report->report();
         $timeTaken = microtime(true) - $startTime;
-        echo 'Time: ' . sigFig($timeTaken, 5) . " seconds\n";
+        echo 'Time: ' . Toolbelt::significantFigure($timeTaken, 5) . " seconds\n";
         echo "-- PDC Complete --\n";
     }
 
