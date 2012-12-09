@@ -59,7 +59,7 @@ class PDC {
 
 		$report = new Report();
 		$report->add(ReportType::FILE, new ReportIndex('%d files checked'));
-		$report->add(ReportType::WARNING, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
+		$report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
 		$report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
 		$report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
 		$report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));

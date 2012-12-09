@@ -24,7 +24,7 @@ class ReportType {
 
 	const FILE = 100;
 	const MISMATCH = 200;
-	const NAMESPACE = 300;
+	const NO_NAMESPACE = 300;
 	const NOT_FOUND = 400;
 	const UNUSED = 500;
 	
