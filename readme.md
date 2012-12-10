@@ -27,15 +27,16 @@ PDC is a Command Line Interface (CLI) tool. It does not have an graphical interf
 
     $ pdc /path/to/src
 
-An optional second parameter allows you to define the autoloader for PDC to perform additional checking. So for example if you use [Composer](http://getcomposer.org/), you can use `vendor/autoload.php` as your second parameter like this:
+An optional second parameter allows you to define the autoloader for PDC to perform additional checking.
 
-    $ pdc src/ vendor/autoload.php
+    $ pdc src autoload.php
+
+If you use [Composer](http://getcomposer.org/), PDC will automatically detect `vendor/autoload.php` and automatically include the autoloader so as to give you a smoother experience.
 
 You can clone this repository and directly run PDC in your Travis-CI builds in the same manner by adding the following into your `.travis.yml` file:
 
     after_script:
-      - git clone https://github.com/packfire/pdc.git
-      - php pdc/pdc src
+      - "wget --quiet https://github.com/downloads/packfire/pdc/pdc.phar && php pdc.phar src"
 
 ##License
 
