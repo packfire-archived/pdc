@@ -47,7 +47,7 @@ class PDC {
      * @var string
      * @since 1.0.4
      */
-    private $path = __DIR__;
+    private $path;
 
     public function __construct($args) {
         $optionSet = new OptionSet();
@@ -59,35 +59,39 @@ class PDC {
     public function run() {
         echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
 
-        $startTime = microtime(true);
-        $iterator = new \RecursiveIteratorIterator(
-                        new \RecursiveDirectoryIterator($this->path),
-                        \RecursiveIteratorIterator::CHILD_FIRST);
-        if ($this->autoloader) {
-            require $this->autoloader;
-        } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
-            include('vendor/autoload.php');
-        }
-
-        $report = new Report();
-        $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
-        $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
-        $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
-        $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
-        $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
-
-        foreach ($iterator as $path) {
-            $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
-            if ($path->isFile() && $extension == 'php') {
-                $analyzer = new Analyzer($path);
-                $analyzer->analyze($report);
+        if($this->path){
+            $startTime = microtime(true);
+            $iterator = new \RecursiveIteratorIterator(
+                            new \RecursiveDirectoryIterator($this->path),
+                            \RecursiveIteratorIterator::CHILD_FIRST);
+            if ($this->autoloader) {
+                require $this->autoloader;
+            } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
+                include('vendor/autoload.php');
             }
-        }
 
-        echo $report->report();
-        $timeTaken = microtime(true) - $startTime;
-        echo 'Time: ' . Toolbelt::significantFigure($timeTaken, 5) . " seconds\n";
-        echo "-- PDC Complete --\n";
+            $report = new Report();
+            $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
+            $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
+            $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
+            $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
+            $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
+
+            foreach ($iterator as $path) {
+                $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
+                if ($path->isFile() && $extension == 'php') {
+                    $analyzer = new Analyzer($path);
+                    $analyzer->analyze($report);
+                }
+            }
+
+            echo $report->report();
+            $timeTaken = microtime(true) - $startTime;
+            echo 'Time: ' . Toolbelt::significantFigure($timeTaken, 5) . " seconds\n";
+            echo "-- PDC Complete --\n";
+        }else{
+            echo "Usage: php pdc.phar [source] [autoload.php]\n";
+        }
     }
 
     public function setPath($path) {
