@@ -10,7 +10,7 @@
  * All rights reserved.
  */
 
-require('../src/Packfire/PDC/Bootstrap.php');
+require(__DIR__ . '/../src/Packfire/PDC/Bootstrap.php');
 
 use Packfire\PDC\Compiler;
 
