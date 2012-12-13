@@ -50,9 +50,10 @@ class PDC {
     private $path;
 
     public function __construct($args) {
+        array_shift($args);
         $optionSet = new OptionSet();
-        $optionSet->addIndex(2, array($this, 'setAutoLoader'));
-        $optionSet->addIndex(1, array($this, 'setPath'));
+        $optionSet->add('autoload=', array($this, 'setAutoLoader'));
+        $optionSet->addIndex(-1, array($this, 'setPath'));
         $optionSet->parse($args);
     }
 
@@ -90,7 +91,7 @@ class PDC {
             echo 'Time: ' . Toolbelt::significantFigure($timeTaken, 5) . " seconds\n";
             echo "-- PDC Complete --\n";
         }else{
-            echo "Usage: php pdc.phar [source] [autoload.php]\n";
+            echo "Usage: php pdc.phar [--autoload=vendor/autoload.php] [source-dir]\n";
         }
     }
 
