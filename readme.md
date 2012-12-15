@@ -23,13 +23,13 @@ You can run [PDC with your Travis-CI builds](http://packfire.tumblr.com/post/342
 
 ##Usage
 
-PDC is a Command Line Interface (CLI) tool. It does not have an graphical interface. To run PDC on your source code, simply add the path to the source code behind:
+PDC is a Command Line Interface (CLI) tool. It does not have an graphical interface. To run PDC on your source code, simply add the path to the end of the arguments:
 
-    $ pdc /path/to/src
+    $ php pdc.phar /path/to/src
 
-An optional second parameter allows you to define the autoloader for PDC to perform additional checking.
+An optional `bootstrap` parameter allows you to define the autoloader for PDC to perform additional checking.
 
-    $ pdc src autoload.php
+    $ php pdc.phar --bootstrap=autoload.php src
 
 If you use [Composer](http://getcomposer.org/), PDC will automatically detect `vendor/autoload.php` and automatically include the autoloader so as to give you a smoother experience.
 
