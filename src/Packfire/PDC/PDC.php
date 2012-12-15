@@ -35,6 +35,8 @@ class PDC {
      */
     const VERSION = '{{version}}';
 
+    private $optionSet;
+
     /**
      * Path to autoloader
      * @var string
@@ -49,18 +51,24 @@ class PDC {
      */
     private $path;
 
+    private $help = true;
+
     public function __construct($args) {
         array_shift($args);
-        $optionSet = new OptionSet();
-        $optionSet->add('autoload=', array($this, 'setAutoLoader'));
-        $optionSet->addIndex(-1, array($this, 'setPath'));
-        $optionSet->parse($args);
+        $this->optionSet = new OptionSet();
+        $this->optionSet->add('bootstrap=', array($this, 'setAutoLoader'), 'Set the script to perform bootstrapping and autoloading.');
+        $this->optionSet->add('h|help', array($this, 'setHelp'), 'Display PDC help information.');
+        $this->optionSet->addIndex(-1, array($this, 'setPath'));
+        $this->optionSet->parse($args);
     }
 
     public function run() {
         echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
 
-        if($this->path){
+        if($this->help){
+            echo "Usage: php pdc.phar [--bootstrap=vendor/autoload.php] [source-dir]\n\n";
+            echo $this->optionSet->help();
+        }else{
             $startTime = microtime(true);
             $iterator = new \RecursiveIteratorIterator(
                             new \RecursiveDirectoryIterator($this->path),
@@ -90,12 +98,15 @@ class PDC {
             $timeTaken = microtime(true) - $startTime;
             echo 'Time: ' . Toolbelt::significantFigure($timeTaken, 5) . " seconds\n";
             echo "-- PDC Complete --\n";
-        }else{
-            echo "Usage: php pdc.phar [--autoload=vendor/autoload.php] [source-dir]\n";
         }
     }
 
+    public function setHelp(){
+        $this->help = true;
+    }
+
     public function setPath($path) {
+        $this->help = false;
         $this->path = $path;
     }
 
