@@ -35,6 +35,11 @@ class PDC {
      */
     const VERSION = '{{version}}';
 
+    /**
+     * The option set controller
+     * @var \Packfire\Command\OptionSet
+     * @since 1.0.5
+     */
     private $optionSet;
 
     /**
@@ -51,8 +56,18 @@ class PDC {
      */
     private $path;
 
+    /**
+     * Flag whether display help screen or not
+     * @var boolean
+     * @since 1.0.5
+     */
     private $help = true;
 
+    /**
+     * Create a new PDC object
+     * @param array $args The argument for the console application
+     * @since 1.0.4
+     */
     public function __construct($args) {
         array_shift($args);
         $this->optionSet = new OptionSet();
@@ -62,11 +77,15 @@ class PDC {
         $this->optionSet->parse($args);
     }
 
+    /**
+     * Run the console application
+     * @since 1.0.4
+     */
     public function run() {
         echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
 
         if($this->help){
-            echo "Usage: php pdc.phar [--bootstrap=vendor/autoload.php] [source-dir]\n\n";
+            echo "Usage: php pdc.phar [--bootstrap=vendor/autoload.php] source-dir\n\n";
             echo $this->optionSet->help();
         }else{
             $startTime = microtime(true);
