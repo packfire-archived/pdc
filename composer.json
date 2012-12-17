@@ -1,7 +1,6 @@
 {
     "name": "packfire/pdc",
     "description": "PDC for PHP - Smart little worker that checks on your PHP source code's class dependencies.",
-    "version": "1.0.5",
     "homepage": "http://mauris.sg/packfire/",
     "type": "library",
     "keywords": [
@@ -28,7 +27,7 @@
     },
     "require":{
         "php": ">=5.3.0",
-        "packfire/options": "1.0.*",
+        "packfire/options": "1.1.*",
         "symfony/process": "2.1.*"
     },
     "autoload": {
