@@ -89,27 +89,33 @@ class PDC {
             echo $this->optionSet->help();
         }else{
             $startTime = microtime(true);
-            $iterator = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator($this->path),
-                            \RecursiveIteratorIterator::CHILD_FIRST);
+
+            // perform inclusion of autoloader / performing bootstrap once
             if ($this->autoloader) {
                 require $this->autoloader;
             } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
                 include('vendor/autoload.php');
             }
 
-            $report = new Report();
-            $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
-            $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
-            $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
-            $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
-            $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
+            $paths = explode(PATH_SEPARATOR, $this->path);
+            foreach($paths as $path) {
+                $iterator = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator($path),
+                                \RecursiveIteratorIterator::CHILD_FIRST);
 
-            foreach ($iterator as $path) {
-                $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
-                if ($path->isFile() && $extension == 'php') {
-                    $analyzer = new Analyzer($path);
-                    $analyzer->analyze($report);
+                $report = new Report();
+                $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
+                $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
+                $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
+                $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
+                $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
+
+                foreach ($iterator as $file) {
+                    $extension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
+                    if ($file->isFile() && $extension == 'php') {
+                        $analyzer = new Analyzer($file);
+                        $analyzer->analyze($report);
+                    }
                 }
             }
 
