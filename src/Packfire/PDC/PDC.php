@@ -99,7 +99,8 @@ class PDC {
 
             // initialize report generation sequence
             $report = new Report();
-            $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
+            $fileReport = new ReportIndex('%d files checked');
+            $report->add(ReportType::FILE, $fileReport);
             $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
             $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
             $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
@@ -118,6 +119,10 @@ class PDC {
                         $analyzer->analyze($report);
                     }
                 }
+            }
+
+            if($fileReport->count() == 0){
+                echo "Warning: No files checked\n\n";
             }
 
             echo $report->report();
