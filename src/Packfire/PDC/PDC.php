@@ -108,6 +108,7 @@ class PDC {
 
             $paths = explode(PATH_SEPARATOR, $this->path);
             foreach($paths as $path) {
+                echo "Checking \"$path\"...\n\n";
                 $iterator = new \RecursiveIteratorIterator(
                                 new \RecursiveDirectoryIterator($path),
                                 \RecursiveIteratorIterator::CHILD_FIRST);
