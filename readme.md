@@ -36,7 +36,7 @@ If you use [Composer](http://getcomposer.org/), PDC will automatically detect `v
 You can clone this repository and directly run PDC in your Travis-CI builds in the same manner by adding the following into your `.travis.yml` file:
 
     after_script:
-      - "wget --quiet https://github.com/downloads/packfire/pdc/pdc.phar && php pdc.phar src"
+      - "wget --quiet http://mauris.sg/bin/pdc.phar && php pdc.phar src"
 
 ##License
 
