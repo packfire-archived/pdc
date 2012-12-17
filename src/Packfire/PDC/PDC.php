@@ -11,7 +11,7 @@
 
 namespace Packfire\PDC;
 
-use Packfire\Command\OptionSet;
+use Packfire\Options\OptionSet;
 use Packfire\PDC\Toolbelt;
 use Packfire\PDC\Report\Report;
 use Packfire\PDC\Report\ReportType;
