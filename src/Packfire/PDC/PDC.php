@@ -11,7 +11,7 @@
 
 namespace Packfire\PDC;
 
-use Packfire\Command\OptionSet;
+use Packfire\Options\OptionSet;
 use Packfire\PDC\Toolbelt;
 use Packfire\PDC\Report\Report;
 use Packfire\PDC\Report\ReportType;
@@ -89,28 +89,41 @@ class PDC {
             echo $this->optionSet->help();
         }else{
             $startTime = microtime(true);
-            $iterator = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator($this->path),
-                            \RecursiveIteratorIterator::CHILD_FIRST);
+
+            // perform inclusion of autoloader / performing bootstrap once
             if ($this->autoloader) {
                 require $this->autoloader;
             } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
                 include('vendor/autoload.php');
             }
 
+            // initialize report generation sequence
             $report = new Report();
-            $report->add(ReportType::FILE, new ReportIndex('%d files checked'));
+            $fileReport = new ReportIndex('%d files checked');
+            $report->add(ReportType::FILE, $fileReport);
             $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
             $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
             $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
             $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
 
-            foreach ($iterator as $path) {
-                $extension = pathinfo($path->getFilename(), PATHINFO_EXTENSION);
-                if ($path->isFile() && $extension == 'php') {
-                    $analyzer = new Analyzer($path);
-                    $analyzer->analyze($report);
+            $paths = explode(PATH_SEPARATOR, $this->path);
+            foreach($paths as $path) {
+                echo "Checking \"$path\"...\n\n";
+                $iterator = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator($path),
+                                \RecursiveIteratorIterator::CHILD_FIRST);
+
+                foreach ($iterator as $file) {
+                    $extension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
+                    if ($file->isFile() && $extension == 'php') {
+                        $analyzer = new Analyzer($file);
+                        $analyzer->analyze($report);
+                    }
                 }
+            }
+
+            if($fileReport->count() == 0){
+                echo "Warning: No files checked\n\n";
             }
 
             echo $report->report();

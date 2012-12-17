@@ -135,12 +135,13 @@ class Analyzer {
         $report->processFile((string) $this->info);
         $report->increment(ReportType::FILE);
         $className = $this->info->getBasename('.php');
-        if (!$this->checkMismatch($className)) {
-            $report->increment(ReportType::MISMATCH, $className);
-        }
 
         $namespace = $this->fetchNamespace();
-        if (!$namespace) {
+        if ($namespace) {
+            if (!$this->checkMismatch($className)) {
+                $report->increment(ReportType::MISMATCH, $className);
+            }
+        } else {
             $report->increment(ReportType::NO_NAMESPACE);
         }
 
