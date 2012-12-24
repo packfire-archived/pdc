@@ -14,5 +14,5 @@ require(__DIR__ . '/../src/Packfire/PDC/Bootstrap.php');
 
 use Packfire\PDC\Compiler;
 
-$pdc = new Compiler();
-$pdc->compile();
+$compiler = new Compiler('pdc.phar');
+$compiler->build();
