@@ -21,6 +21,10 @@ You can run [PDC with your Travis-CI builds](http://packfire.tumblr.com/post/342
 
 - PHP 5.3 or higher
 
+##Download
+
+Download the PDC PHAR binary at [http://mauris.sg/bin/pdc.phar](http://mauris.sg/bin/pdc.phar).
+
 ##Usage
 
 PDC is a Command Line Interface (CLI) tool. It does not have an graphical interface. To run PDC on your source code, simply add the path to the end of the arguments:
@@ -31,9 +35,13 @@ An optional `bootstrap` parameter allows you to define the autoloader for PDC to
 
     $ php pdc.phar --bootstrap=autoload.php src
 
-If you use [Composer](http://getcomposer.org/), PDC will automatically detect `vendor/autoload.php` and automatically include the autoloader so as to give you a smoother experience.
+If you use [Composer](http://getcomposer.org/), PDC will automatically detect `vendor/autoload.php` and automatically include the autoloader to give you a smoother experience.
 
-You can clone this repository and directly run PDC in your Travis-CI builds in the same manner by adding the following into your `.travis.yml` file:
+To check multiple directories, use the PATH_SEPARATOR (i.e. ';') in your last parameter. The following example will check source code in both `src` and `test` directories. 
+
+    $ php pdc.phar src;test
+
+To run PDC in your Travis-CI builds, add the following into your `.travis.yml` file:
 
     after_script:
       - "wget --quiet http://mauris.sg/bin/pdc.phar && php pdc.phar src"
