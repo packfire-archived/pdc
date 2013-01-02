@@ -21,7 +21,7 @@ namespace Packfire\PDC\Report;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Report {
+class Report implements IReport {
 
     private $indexes = array();
     private $files = array();
