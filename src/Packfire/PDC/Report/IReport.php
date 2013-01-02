@@ -23,7 +23,7 @@ namespace Packfire\PDC\Report;
  */
 interface IReport {
     
-    public function add($key, $index);
+    public function add($key, IIndex $index);
     
     public function processFile($file);
     

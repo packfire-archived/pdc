@@ -16,6 +16,7 @@ use Packfire\PDC\Toolbelt;
 use Packfire\PDC\Report\Report;
 use Packfire\PDC\Report\ReportType;
 use Packfire\PDC\Report\Index as ReportIndex;
+use Packfire\PDC\Analyzer\Analyzer;
 
 /**
  * The main PDC class for running and processing the source code
