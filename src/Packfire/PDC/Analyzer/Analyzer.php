@@ -25,7 +25,7 @@ use Packfire\PDC\Toolbelt;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Analyzer {
+class Analyzer implements IAnalyzer {
 
     /**
      * The file info object
@@ -102,7 +102,7 @@ class Analyzer {
         return $namespace;
     }
 
-    public function checkClasses($namespace, IReport $report){
+    protected function checkClasses($namespace, IReport $report){
         $index = $this->useIndexing();
         $classes = $this->classes();
         $used = array();
@@ -175,7 +175,7 @@ class Analyzer {
      * @return array Returns an array of string containing all the class names
      * @since 1.0.4
      */
-    public function classes() {
+    protected function classes() {
         $classes = array();
         for ($idx = 0; $idx < $this->count; ++$idx) {
             if (is_array($this->tokens[$idx])) {
