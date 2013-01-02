@@ -104,7 +104,7 @@ class Analyzer implements IAnalyzer {
 
     protected function checkClasses($namespace, IReport $report){
         $index = $this->useIndexing();
-        $classes = $this->classes();
+        $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
             if(!preg_match('`(parent|self|static|^\$)`', $name)){
@@ -175,7 +175,7 @@ class Analyzer implements IAnalyzer {
      * @return array Returns an array of string containing all the class names
      * @since 1.0.4
      */
-    protected function classes() {
+    protected function findUsages() {
         $classes = array();
         for ($idx = 0; $idx < $this->count; ++$idx) {
             if (is_array($this->tokens[$idx])) {
