@@ -19,37 +19,28 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Packfire\PDC\Analyzer\File::className
-     * @todo   Implement testClassName().
      */
     public function testClassName()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $obj = new File('Test/Complete.php');
+        $this->assertEquals('Complete', $obj->className());
     }
 
     /**
      * @covers Packfire\PDC\Analyzer\File::path
-     * @todo   Implement testPath().
      */
     public function testPath()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $obj = new File('Test/Complete.php');
+        $this->assertEquals('Test/Complete.php', $obj->path());
     }
 
     /**
      * @covers Packfire\PDC\Analyzer\File::source
-     * @todo   Implement testSource().
      */
     public function testSource()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $obj = new File(__FILE__);
+        $this->assertNotEmpty($obj->source());
     }
 }
