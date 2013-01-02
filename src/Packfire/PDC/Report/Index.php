@@ -21,7 +21,7 @@ namespace Packfire\PDC\Report;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Index implements \Countable {
+class Index implements IIndex {
 
     /**
      * The counter of the index
