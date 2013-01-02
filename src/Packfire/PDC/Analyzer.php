@@ -87,7 +87,7 @@ class Analyzer {
     }
 
     protected function checkMismatch($name) {
-        return preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 1;
+        return preg_match('`(class|interface|trait)\\s' . $name . '\\W`s', $this->source) == 1;
     }
 
     protected function fetchNamespace() {
