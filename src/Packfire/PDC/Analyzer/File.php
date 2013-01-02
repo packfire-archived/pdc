@@ -12,7 +12,7 @@
 namespace Packfire\PDC\Analyzer;
 
 /**
- * File to be analyzed abstraction
+ * File to be analyzed
  * 
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
@@ -21,14 +21,24 @@ namespace Packfire\PDC\Analyzer;
  * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-interface IFile {
+class File implements IFile {
     
-    public function __construct($path);
+    private $path;
     
-    public function source();
-    
-    public function path();
-    
-    public function className();
+    public function __construct($path) {
+        $this->path = $path;
+    }
+
+    public function className() {
+        return preg_replace('{\.php$}', '', basename($this->path));
+    }
+
+    public function path() {
+        return $this->path;
+    }
+
+    public function source() {
+        return file_get_contents($this->path);
+    }
     
 }
