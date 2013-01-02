@@ -12,6 +12,7 @@
 namespace Packfire\PDC;
 
 use Packfire\PDC\Report\ReportType;
+use Packfire\PDC\Report\IReport;
 
 /**
  * Analyzes source code for namespace, class declaration and usage
@@ -100,7 +101,7 @@ class Analyzer {
         return $namespace;
     }
 
-    public function checkClasses($namespace, $report){
+    public function checkClasses($namespace, IReport $report){
         $index = $this->useIndexing();
         $classes = $this->classes();
         $used = array();
@@ -128,10 +129,10 @@ class Analyzer {
 
     /**
      * Perform analysis on the file
-     * @param \Packfire\PDC\Report\Report $report The report to be generated later
+     * @param \Packfire\PDC\Report\IReport $report The report to be generated later
      * @since 1.0.4
      */
-    public function analyze($report) {
+    public function analyze(IReport $report) {
         $report->processFile((string) $this->info);
         $report->increment(ReportType::FILE);
         $className = $this->info->getBasename('.php');

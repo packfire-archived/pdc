@@ -27,8 +27,8 @@ class Report implements IReport {
     private $files = array();
     private $currentFile;
 
-    public function add($key, $index) {
-        if ($index instanceof Index) {
+    public function add($key, IIndex $index) {
+        if ($index instanceof IIndex) {
             $this->indexes[$key] = $index;
         } else {
             throw new \InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
