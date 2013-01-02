@@ -17,6 +17,7 @@ use Packfire\PDC\Report\Report;
 use Packfire\PDC\Report\ReportType;
 use Packfire\PDC\Report\Index as ReportIndex;
 use Packfire\PDC\Analyzer\Analyzer;
+use Packfire\PDC\Analyzer\File;
 
 /**
  * The main PDC class for running and processing the source code
@@ -117,7 +118,7 @@ class PDC {
                 foreach ($iterator as $file) {
                     $extension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
                     if ($file->isFile() && $extension == 'php') {
-                        $analyzer = new Analyzer($file);
+                        $analyzer = new Analyzer(new File((string)$file));
                         $analyzer->analyze($report);
                     }
                 }

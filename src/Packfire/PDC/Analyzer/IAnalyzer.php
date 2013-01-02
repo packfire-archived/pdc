@@ -25,7 +25,7 @@ use Packfire\PDC\Report\IReport;
  */
 interface IAnalyzer {
     
-    public function __construct($file);
+    public function __construct(IFile $file);
     
     public function analyze(IReport $report);
     

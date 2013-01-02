@@ -28,11 +28,11 @@ use Packfire\PDC\Toolbelt;
 class Analyzer implements IAnalyzer {
 
     /**
-     * The file info object
-     * @var SplFileInfo
-     * @since 1.0.4
+     * The file object
+     * @var \Packfire\PDC\Analyzer\IFile
+     * @since 1.0.8
      */
-    private $info;
+    private $file;
 
     /**
      * Original PHP source code
@@ -57,16 +57,12 @@ class Analyzer implements IAnalyzer {
 
     /**
      * Create a new Analyzer object
-     * @param string|\SplFileInfo $file Path name to the PHP file to analyze
+     * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
      * @since 1.0.4
      */
-    public function __construct($file) {
-        if ($file instanceof \SplFileInfo) {
-            $this->info = $file;
-        } else {
-            $this->info = new \SplFileInfo($file);
-        }
-        $this->source = file_get_contents((string) $this->info);
+    public function __construct(IFile $file) {
+        $this->file = $file;
+        $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
         $this->count = count($this->tokens);
     }
@@ -134,9 +130,9 @@ class Analyzer implements IAnalyzer {
      * @since 1.0.4
      */
     public function analyze(IReport $report) {
-        $report->processFile((string) $this->info);
+        $report->processFile($this->file->path());
         $report->increment(ReportType::FILE);
-        $className = $this->info->getBasename('.php');
+        $className = $this->file->className();
 
         $namespace = $this->fetchNamespace();
         if ($namespace) {
