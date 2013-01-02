@@ -219,6 +219,21 @@ class Analyzer implements IAnalyzer {
                             break;
                         }
                     }
+                }elseif($current == T_FUNCTION){
+                    $idx += 3;
+                    if($this->tokens[$idx] == '('){
+                        while (++$idx < $this->count) {
+                            if (is_array($this->tokens[$idx])) {
+                                $current = $this->tokens[$idx][0];
+                                if($current == T_NS_SEPARATOR
+                                        || ($current == T_STRING && $this->tokens[$idx][1] != 'null')){
+                                    $classes[] = $this->fullClass($idx);
+                                }
+                            }elseif($this->tokens[$idx] == ')'){
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
