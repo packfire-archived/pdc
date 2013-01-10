@@ -149,18 +149,22 @@ class Analyzer implements IAnalyzer {
     protected function useIndexing() {
         $index = array();
         $uses = array();
-        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $this->source, $uses, PREG_SET_ORDER);
+        preg_match_all('{use\\s([a-z\\\\\\s,]+);}i', $this->source, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
-            if (isset($use['alias'])) {
-                $index[$use['alias']] = $use['namespace'];
-            } else {
-                if (false !== $pos = strrpos($use['namespace'], '\\')) {
-                    $alias = substr($use['namespace'], $pos + 1);
+            $use = explode(',', $use[1]);
+            foreach($use as $case){
+                preg_match('{([a-z\\\\]+)(\\sas\\s([a-z\\\\]+)|)}i', $case, $case);
+                if ($case[2]) {
+                    $index[$case[3]] = $case[1];
                 } else {
-                    $alias = $use['namespace'];
-                    $index[Toolbelt::classFromNamespace($alias)] = $alias;
+                    if (false !== $pos = strrpos($case[1], '\\')) {
+                        $alias = substr($case[1], $pos + 1);
+                    } else {
+                        $alias = $case[1];
+                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
+                    }
+                    $index[$alias] = $case[1];
                 }
-                $index[$alias] = $use['namespace'];
             }
         }
         return $index;
