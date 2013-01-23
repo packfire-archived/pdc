@@ -177,6 +177,8 @@ class Analyzer implements IAnalyzer {
      */
     protected function findUsages() {
         $classes = array();
+        $inClass = false;
+        $classLevel = 0;
         for ($idx = 0; $idx < $this->count; ++$idx) {
             if (is_array($this->tokens[$idx])) {
                 $current = $this->tokens[$idx][0];
@@ -238,6 +240,32 @@ class Analyzer implements IAnalyzer {
                             }
                         }
                     }
+                }elseif($current == T_CLASS){
+                    $inClass = true;
+                }elseif($inClass && $current == T_USE){
+                    // traits usage
+                    while (++$idx < $this->count) {
+                        if (is_array($this->tokens[$idx])) {
+                            $current = $this->tokens[$idx][0];
+                            if ($current == T_STRING
+                                    || $current == T_NS_SEPARATOR) {
+                                $class = $this->fullClass($idx);
+                                $classes[] = $class;
+                                --$idx;
+                            }
+                        } elseif ($this->tokens[$idx] == ';') {
+                            break;
+                        }
+                    }
+                }
+            }elseif($inClass){
+                if($this->tokens[$idx] == '{'){
+                    ++$classLevel;
+                }elseif($this->tokens[$idx] == '}'){
+                    --$classLevel;
+                }
+                if($classLevel == 0){
+                    $inClass = false;
                 }
             }
         }
