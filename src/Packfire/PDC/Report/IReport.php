@@ -12,21 +12,23 @@
 namespace Packfire\PDC\Report;
 
 /**
- * Enumeration of report types
+ * A Report Interface
  * 
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
  * @package Packfire\PDC\Report
- * @since 1.0.4
+ * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-class ReportType {
-
-    const FILE = 100;
-    const MISMATCH = 200;
-    const NO_NAMESPACE = 300;
-    const NOT_FOUND = 400;
-    const UNUSED = 500;
-	
+interface IReport {
+    
+    public function add($key, IIndex $index);
+    
+    public function processFile($file);
+    
+    public function increment($key, $details = null);
+    
+    public function report();
+    
 }

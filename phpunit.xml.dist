@@ -13,7 +13,4 @@
             <directory suffix="Test.php">test</directory>
         </testsuite>
     </testsuites>
-    <php>
-        <const name="__ENVIRONMENT__" value="test" />
-    </php>
 </phpunit>

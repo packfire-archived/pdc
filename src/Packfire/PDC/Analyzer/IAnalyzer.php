@@ -9,24 +9,24 @@
  * All rights reserved.
  */
 
-namespace Packfire\PDC\Report;
+namespace Packfire\PDC\Analyzer;
+
+use Packfire\PDC\Report\IReport;
 
 /**
- * Enumeration of report types
+ * Analyzes source code for namespace, class declaration and usage
  * 
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
- * @package Packfire\PDC\Report
- * @since 1.0.4
+ * @package Packfire\PDC\Analyzer
+ * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-class ReportType {
-
-    const FILE = 100;
-    const MISMATCH = 200;
-    const NO_NAMESPACE = 300;
-    const NOT_FOUND = 400;
-    const UNUSED = 500;
-	
+interface IAnalyzer {
+    
+    public function __construct(IFile $file);
+    
+    public function analyze(IReport $report);
+    
 }

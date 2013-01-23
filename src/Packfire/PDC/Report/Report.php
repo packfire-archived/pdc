@@ -5,7 +5,7 @@
  * By Sam-Mauris Yong
  * 
  * Released open source under New BSD 3-Clause License.
- * Copyright (c) 2012, Sam-Mauris Yong Shan Xian <sam@mauris.sg>
+ * Copyright (c) Sam-Mauris Yong <sam@mauris.sg>
  * All rights reserved.
  */
 
@@ -15,20 +15,20 @@ namespace Packfire\PDC\Report;
  * Report holding object
  * 
  * @author Sam-Mauris Yong <sam@mauris.sg>
- * @copyright 2012 Sam-Mauris Yong Shan Xian <sam@mauris.sg>
+ * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
  * @package Packfire\PDC\Report
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Report {
+class Report implements IReport {
 
     private $indexes = array();
     private $files = array();
     private $currentFile;
 
-    public function add($key, $index) {
-        if ($index instanceof Index) {
+    public function add($key, IIndex $index) {
+        if ($index instanceof IIndex) {
             $this->indexes[$key] = $index;
         } else {
             throw new \InvalidArgumentException('Report::add() expected $index to be an object of \Packfire\PDC\Report\Index.');
