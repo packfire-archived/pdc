@@ -5,32 +5,34 @@
  * By Sam-Mauris Yong
  * 
  * Released open source under New BSD 3-Clause License.
- * Copyright (c) 2012, Sam-Mauris Yong Shan Xian <sam@mauris.sg>
+ * Copyright (c) Sam-Mauris Yong <sam@mauris.sg>
  * All rights reserved.
  */
 
-namespace Packfire\PDC;
+namespace Packfire\PDC\Analyzer;
 
 use Packfire\PDC\Report\ReportType;
+use Packfire\PDC\Report\IReport;
+use Packfire\PDC\Toolbelt;
 
 /**
  * Analyzes source code for namespace, class declaration and usage
  * 
  * @author Sam-Mauris Yong <sam@mauris.sg>
- * @copyright 2012 Sam-Mauris Yong Shan Xian <sam@mauris.sg>
+ * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
- * @package Packfire\PDC
+ * @package Packfire\PDC\Analyzer
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Analyzer {
+class Analyzer implements IAnalyzer {
 
     /**
-     * The file info object
-     * @var SplFileInfo
-     * @since 1.0.4
+     * The file object
+     * @var \Packfire\PDC\Analyzer\IFile
+     * @since 1.0.8
      */
-    private $info;
+    private $file;
 
     /**
      * Original PHP source code
@@ -55,16 +57,12 @@ class Analyzer {
 
     /**
      * Create a new Analyzer object
-     * @param string|\SplFileInfo $file Path name to the PHP file to analyze
+     * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
      * @since 1.0.4
      */
-    public function __construct($file) {
-        if ($file instanceof \SplFileInfo) {
-            $this->info = $file;
-        } else {
-            $this->info = new \SplFileInfo($file);
-        }
-        $this->source = file_get_contents((string) $this->info);
+    public function __construct(IFile $file) {
+        $this->file = $file;
+        $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
         $this->count = count($this->tokens);
     }
@@ -87,7 +85,7 @@ class Analyzer {
     }
 
     protected function checkMismatch($name) {
-        return preg_match('`(class|interface)\\s' . $name . '\\W`s', $this->source) == 1;
+        return preg_match('`(class|interface|trait)\\s' . $name . '\\W`s', $this->source) == 1;
     }
 
     protected function fetchNamespace() {
@@ -100,9 +98,9 @@ class Analyzer {
         return $namespace;
     }
 
-    public function checkClasses($namespace, $report){
+    protected function checkClasses($namespace, IReport $report){
         $index = $this->useIndexing();
-        $classes = $this->classes();
+        $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
             if(!preg_match('`(parent|self|static|^\$)`', $name)){
@@ -128,13 +126,13 @@ class Analyzer {
 
     /**
      * Perform analysis on the file
-     * @param \Packfire\PDC\Report\Report $report The report to be generated later
+     * @param \Packfire\PDC\Report\IReport $report The report to be generated later
      * @since 1.0.4
      */
-    public function analyze($report) {
-        $report->processFile((string) $this->info);
+    public function analyze(IReport $report) {
+        $report->processFile($this->file->path());
         $report->increment(ReportType::FILE);
-        $className = $this->info->getBasename('.php');
+        $className = $this->file->className();
 
         $namespace = $this->fetchNamespace();
         if ($namespace) {
@@ -151,18 +149,22 @@ class Analyzer {
     protected function useIndexing() {
         $index = array();
         $uses = array();
-        preg_match_all('`use\\s(?<namespace>[a-zA-Z\\\\]+)(\\sas\\s(?<alias>[a-zA-Z]+)|);`s', $this->source, $uses, PREG_SET_ORDER);
+        preg_match_all('{use\\s([a-z\\\\\\s,]+);}i', $this->source, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
-            if (isset($use['alias'])) {
-                $index[$use['alias']] = $use['namespace'];
-            } else {
-                if (false !== $pos = strrpos($use['namespace'], '\\')) {
-                    $alias = substr($use['namespace'], $pos + 1);
+            $use = explode(',', $use[1]);
+            foreach($use as $case){
+                preg_match('{([a-z\\\\]+)(\\sas\\s([a-z\\\\]+)|)}i', $case, $case);
+                if ($case[2]) {
+                    $index[$case[3]] = $case[1];
                 } else {
-                    $alias = $use['namespace'];
-                    $index[Toolbelt::classFromNamespace($alias)] = $alias;
+                    if (false !== $pos = strrpos($case[1], '\\')) {
+                        $alias = substr($case[1], $pos + 1);
+                    } else {
+                        $alias = $case[1];
+                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
+                    }
+                    $index[$alias] = $case[1];
                 }
-                $index[$alias] = $use['namespace'];
             }
         }
         return $index;
@@ -173,8 +175,10 @@ class Analyzer {
      * @return array Returns an array of string containing all the class names
      * @since 1.0.4
      */
-    public function classes() {
+    protected function findUsages() {
         $classes = array();
+        $inClass = false;
+        $classLevel = 0;
         for ($idx = 0; $idx < $this->count; ++$idx) {
             if (is_array($this->tokens[$idx])) {
                 $current = $this->tokens[$idx][0];
@@ -221,6 +225,47 @@ class Analyzer {
                             break;
                         }
                     }
+                }elseif($current == T_FUNCTION){
+                    $idx += 3;
+                    if($this->tokens[$idx] == '('){
+                        while (++$idx < $this->count) {
+                            if (is_array($this->tokens[$idx])) {
+                                $current = $this->tokens[$idx][0];
+                                if($current == T_NS_SEPARATOR
+                                        || ($current == T_STRING && $this->tokens[$idx][1] != 'null')){
+                                    $classes[] = $this->fullClass($idx);
+                                }
+                            }elseif($this->tokens[$idx] == ')'){
+                                break;
+                            }
+                        }
+                    }
+                }elseif($current == T_CLASS){
+                    $inClass = true;
+                }elseif($inClass && $current == T_USE){
+                    // traits usage
+                    while (++$idx < $this->count) {
+                        if (is_array($this->tokens[$idx])) {
+                            $current = $this->tokens[$idx][0];
+                            if ($current == T_STRING
+                                    || $current == T_NS_SEPARATOR) {
+                                $class = $this->fullClass($idx);
+                                $classes[] = $class;
+                                --$idx;
+                            }
+                        } elseif ($this->tokens[$idx] == ';') {
+                            break;
+                        }
+                    }
+                }
+            }elseif($inClass){
+                if($this->tokens[$idx] == '{'){
+                    ++$classLevel;
+                }elseif($this->tokens[$idx] == '}'){
+                    --$classLevel;
+                }
+                if($classLevel == 0){
+                    $inClass = false;
                 }
             }
         }
