@@ -258,8 +258,6 @@ class Analyzer implements IAnalyzer {
                                             }
                                         }
                                         break;
-                                    }elseif($nest == 0 && $this->tokens[$idx] == ','){
-                                        break;
                                     }elseif($this->tokens[$idx] == '('){
                                         ++$nest;
                                     }elseif($this->tokens[$idx] == ')'){
