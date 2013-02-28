@@ -232,8 +232,43 @@ class Analyzer implements IAnalyzer {
                             if (is_array($this->tokens[$idx])) {
                                 $current = $this->tokens[$idx][0];
                                 if($current == T_NS_SEPARATOR
-                                        || ($current == T_STRING && $this->tokens[$idx][1] != 'null')){
+                                        || ($current == T_STRING && !in_array($this->tokens[$idx][1], array('null', 'false', 'true')))){
                                     $classes[] = $this->fullClass($idx);
+                                }
+                            }elseif($this->tokens[$idx] == '='){
+                                while (++$idx < $this->count) {
+                                    $nest = 0;
+                                    if(is_array($this->tokens[$idx]) && $this->tokens[$idx][0] == T_PAAMAYIM_NEKUDOTAYIM){
+                                        while (!is_array($this->tokens[$idx-1]) || $this->tokens[$idx - 1][0] == T_NS_SEPARATOR
+                                                || $this->tokens[$idx - 1][0] == T_STRING) {
+                                            --$idx;
+                                        }
+                                        $classes[] = $this->fullClass($idx);
+                                        while (++$idx < $this->count) {
+                                            if($nest == 0 && $this->tokens[$idx] == ','){
+                                                break;
+                                            }elseif($this->tokens[$idx] == '('){
+                                                ++$nest;
+                                            }elseif($this->tokens[$idx] == ')'){
+                                                --$nest;
+                                            }
+                                            if($nest < 0){
+                                                --$idx;
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }elseif($nest == 0 && $this->tokens[$idx] == ','){
+                                        break;
+                                    }elseif($this->tokens[$idx] == '('){
+                                        ++$nest;
+                                    }elseif($this->tokens[$idx] == ')'){
+                                        --$nest;
+                                    }
+                                    if($nest < 0){
+                                        --$idx;
+                                        break;
+                                    }
                                 }
                             }elseif($this->tokens[$idx] == ')'){
                                 break;
@@ -242,15 +277,14 @@ class Analyzer implements IAnalyzer {
                     }
                 }elseif($current == T_CLASS){
                     $inClass = true;
-                }elseif($inClass && $current == T_USE){
+                }elseif($inClass && $classLevel == 1 && $current == T_USE){
                     // traits usage
                     while (++$idx < $this->count) {
                         if (is_array($this->tokens[$idx])) {
                             $current = $this->tokens[$idx][0];
                             if ($current == T_STRING
                                     || $current == T_NS_SEPARATOR) {
-                                $class = $this->fullClass($idx);
-                                $classes[] = $class;
+                                $classes[] = $this->fullClass($idx);
                                 --$idx;
                             }
                         } elseif ($this->tokens[$idx] == ';') {
