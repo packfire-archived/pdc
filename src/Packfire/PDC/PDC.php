@@ -95,8 +95,8 @@ class PDC {
             // perform inclusion of autoloader / performing bootstrap once
             if ($this->autoloader) {
                 require $this->autoloader;
-            } elseif (is_file('vendor/autoload.php')) { // autodetect composer's autoloader
-                include('vendor/autoload.php');
+            } elseif (is_file($this->path . '/../vendor/autoload.php')) { // autodetect composer's autoloader
+                include_once($this->path . '/../vendor/autoload.php');
             }
 
             // initialize report generation sequence
