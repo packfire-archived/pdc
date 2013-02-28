@@ -29,7 +29,7 @@
         "php": ">=5.3.0",
         "packfire/options": "1.1.*",
         "symfony/process": "2.1.*",
-        "packfire/concrete": "1.0.*"
+        "packfire/concrete": "1.1.*"
     },
     "autoload": {
         "psr-0": {"Packfire\\PDC": "src/"}

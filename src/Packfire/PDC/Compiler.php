@@ -13,6 +13,7 @@ namespace Packfire\PDC;
 
 use Packfire\Concrete\Compiler as CoreCompiler;
 use Packfire\Concrete\Processor\StripWhiteSpace;
+use Packfire\Concrete\Processor\License;
 
 /**
  * Helps to provide compilation into a PHAR binary
@@ -28,18 +29,18 @@ use Packfire\Concrete\Processor\StripWhiteSpace;
 class Compiler extends CoreCompiler {
     
     protected function compile(){
-        $this->processor = new StripWhiteSpace();
+        $this->processor = new License();
         $this->addFile(new \SplFileInfo(__DIR__ . '/../../../license'));
+        $this->processor = new StripWhiteSpace();
         $this->addFolder(__DIR__ . '/../../');
         $this->addFolder(__DIR__ . '/../../../bin/');
         $this->addFolder(__DIR__ . '/../../../vendor/composer');
         $this->addFolder(__DIR__ . '/../../../vendor/packfire/options');
         $this->addFile(new \SplFileInfo(__DIR__ . '/../../../vendor/autoload.php'));
-        $this->processor = null;
     }
     
     protected function stub(){
-        $stub = <<<'EOF'
+        return <<<'EOF'
 #!/usr/bin/env php
 <?php
 /**
@@ -53,14 +54,6 @@ class Compiler extends CoreCompiler {
 
 Phar::mapPhar('pdc.phar');
 
-EOF;
-
-        // add warning once the phar is older than 30 days
-        if (preg_match('{^[a-f0-9]+$}', $this->version)) {
-            $stub .= "echo \"Warning: this is not a stable build\\n\";\n";
-        }
-
-        return $stub . <<<'EOF'
 require 'phar://pdc.phar/bin/pdc';
 
 __HALT_COMPILER();
