@@ -1,53 +1,6 @@
 {
-    "hash": "b7fbbc7c3e49e77ab67f05ab338db043",
+    "hash": "0e15d9b18ae7d17772fc6ca059c7ef77",
     "packages": [
-        {
-            "name": "packfire/concrete",
-            "version": "1.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/packfire/concrete",
-                "reference": "1.1.2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/packfire/concrete/archive/1.1.2.zip",
-                "reference": "1.1.2",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "symfony/process": "2.1.*",
-                "symfony/finder": "2.1.*"
-            },
-            "time": "2013-01-29 22:32:24",
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Packfire\\Concrete": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Sam-Mauris Yong",
-                    "email": "mauris@hotmail.sg",
-                    "homepage": "http://mauris.sg/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Packfire Concrete: PHAR compiler for PHP-CLI applications",
-            "homepage": "http://mauris.sg/packfire/",
-            "keywords": [
-                "php",
-                "cli",
-                "compiler",
-                "phar"
-            ]
-        },
         {
             "name": "packfire/options",
             "version": "1.1.2",
@@ -65,7 +18,6 @@
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "2012-12-24 12:35:55",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -87,101 +39,16 @@
             "description": "Better CLI argument processing in PHP",
             "homepage": "http://mauris.sg/packfire/",
             "keywords": [
-                "cli",
-                "closure",
                 "argument",
                 "callback",
+                "cli",
+                "closure",
                 "processing"
-            ]
-        },
-        {
-            "name": "symfony/finder",
-            "version": "v2.1.7",
-            "target-dir": "Symfony/Component/Finder",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/Finder",
-                "reference": "v2.1.7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/symfony/Finder/archive/v2.1.7.zip",
-                "reference": "v2.1.7",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "time": "2013-01-09 08:51:07",
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\Finder": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
             ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Finder Component",
-            "homepage": "http://symfony.com"
-        },
-        {
-            "name": "symfony/process",
-            "version": "v2.1.7",
-            "target-dir": "Symfony/Component/Process",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/Process",
-                "reference": "v2.1.7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/symfony/Process/archive/v2.1.7.zip",
-                "reference": "v2.1.7",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "time": "2013-01-16 09:27:54",
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\Process": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Process Component",
-            "homepage": "http://symfony.com"
+            "time": "2012-12-24 12:35:55"
         }
     ],
-    "packages-dev": [
-
-    ],
+    "packages-dev": null,
     "aliases": [
 
     ],
