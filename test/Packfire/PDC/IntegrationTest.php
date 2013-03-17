@@ -29,10 +29,11 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $cmd = realpath(__DIR__ . '/../../../bin/pdc');
         $this->assertTrue(file_exists($cmd), 'PDC binary not found.');
 
-        $autoload = $fixture . '/autoload.php';
-        $src = $fixture . '/src';
+        $autoload = escapeshellarg($fixture . '/autoload.php');
+        $src = escapeshellarg($fixture . '/src');
 
         $report = `/usr/bin/env php $cmd --bootstrap=$autoload $src`;
+        var_dump("/usr/bin/env php $cmd --bootstrap=$autoload $src");
 
         $this->assertStringEndsWith("-- PDC Complete --\n", $report);
         $this->assertThat($report, $this->logicalNot($this->stringContains("\nUnused:", false)));
