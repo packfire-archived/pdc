@@ -14,18 +14,17 @@ namespace Packfire\PDC;
 /**
  * Integration tests comparing actual output against a specific code tree.
  *
- * @todo further split test cases to multiple code trees
- *
  * @group Integration
  */
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider fixtureProvider
-     * @param unknown_type $fixture
+     * @param string $fixture
      */
     public function testFixtures($fixture)
     {
+        // TODO add non-*nix support
         $cmd = realpath(__DIR__ . '/../../../bin/pdc');
         $this->assertTrue(file_exists($cmd), 'PDC binary not found.');
 
@@ -47,9 +46,15 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function fixtureProvider()
     {
-        return array(
-            array(__DIR__ . '/_fixtures/trait-support'),
-//            array(__DIR__ . '/_fixtures/integration1'),
+        $traitSupport = function_exists('trait_exists');
+        $fixtures = array(
+            array(__DIR__ . '/_fixtures/base'),
         );
+
+        if ($traitSupport) {
+            $fixtures[] = array(__DIR__ . '/_fixtures/trait-support');
+        }
+
+        return $fixtures;
     }
 }

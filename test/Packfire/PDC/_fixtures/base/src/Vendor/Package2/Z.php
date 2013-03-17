@@ -2,10 +2,9 @@
 
 namespace Vendor\Package2;
 
-use Vendor\AnotherTrait as SecondTrait;
+use Vendor\Package\X as SomeClass;
 
 class Z extends Y implements \Vendor\Package\AnInterface
 {
-    use \Vendor\SomeTrait;
-    use SecondTrait;
+    public function someMethod(SomeClass $someArgument) {}
 }
