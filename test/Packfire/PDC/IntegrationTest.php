@@ -48,7 +48,8 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
     public function fixtureProvider()
     {
         return array(
-            array(__DIR__ . '/_fixtures/integration1'),
+            array(__DIR__ . '/_fixtures/trait-support'),
+//            array(__DIR__ . '/_fixtures/integration1'),
         );
     }
 }
