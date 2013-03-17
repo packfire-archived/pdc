@@ -33,7 +33,6 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $src = escapeshellarg($fixture . '/src');
 
         $report = `/usr/bin/env php $cmd --bootstrap=$autoload $src`;
-        var_dump("/usr/bin/env php $cmd --bootstrap=$autoload $src");
 
         $this->assertStringEndsWith("-- PDC Complete --\n", $report);
         $this->assertThat($report, $this->logicalNot($this->stringContains("\nUnused:", false)));
