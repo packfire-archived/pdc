@@ -32,7 +32,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $autoload = $fixture . '/autoload.php';
         $src = $fixture . '/src';
 
-        $report = `/usr/bin/env php $cmd --autoload=$autoload $src`;
+        $report = `/usr/bin/env php $cmd --bootstrap=$autoload $src`;
 
         $this->assertStringEndsWith("-- PDC Complete --\n", $report);
         $this->assertThat($report, $this->logicalNot($this->stringContains("\nUnused:", false)));
