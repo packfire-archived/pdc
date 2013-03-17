@@ -49,6 +49,7 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $traitSupport = function_exists('trait_exists');
         $fixtures = array(
             array(__DIR__ . '/_fixtures/base'),
+            array(__DIR__ . '/_fixtures/relative-namespace'),
         );
 
         if ($traitSupport) {
