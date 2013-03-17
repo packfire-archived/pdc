@@ -3,7 +3,7 @@
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
- * 
+ *
  * Released open source under New BSD 3-Clause License.
  * Copyright (c) Sam-Mauris Yong <sam@mauris.sg>
  * All rights reserved.
@@ -17,7 +17,7 @@ use Packfire\PDC\Toolbelt;
 
 /**
  * Analyzes source code for namespace, class declaration and usage
- * 
+ *
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
@@ -85,12 +85,12 @@ class Analyzer implements IAnalyzer {
     }
 
     protected function checkMismatch($name) {
-        return preg_match('`(?:class|interface|trait)\\s' . $name . '\\W`su', $this->source) == 1;
+        return preg_match('`(?:class|interface|trait)\s+' . $name . '\s`su', $this->source) == 1;
     }
 
     protected function fetchNamespace() {
         $namespace = '';
-        if (preg_match('`namespace\\s+(?<namespace>\pL[^\s]*);`su', $this->source, $namespace)) {
+        if (preg_match('`namespace\s+(?<namespace>\pL[^;]*)\s*;`su', $this->source, $namespace)) {
             $namespace = $namespace['namespace'];
         } else {
             $namespace = '';
@@ -146,15 +146,26 @@ class Analyzer implements IAnalyzer {
         $this->checkClasses($namespace, $report);
     }
 
+    // TODO should rather use the tokenizer and be less strict with allowed namespaces
     protected function useIndexing() {
         $index = array();
         $uses = array();
-        preg_match_all('{use\\s+([^;]+);}ui', $this->source, $uses, PREG_SET_ORDER);
+        // clean up header
+        $strip = array(
+            // docblocks
+            '`/[*].+?[*]/`su',
+            // comments
+            '`//.+$`um',
+            // class/ interface/ trait body
+            '`(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
+        );
+        $head = preg_replace($strip, '', $this->source);
+        preg_match_all('`^use\s+(\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
             foreach($use as $case){
-                preg_match('{(\pL[^\s]*)(?:\\s+as\\s+(\pL[^\s]*))?}ui', $case, $case);
-                if (isset($case[2]) && $case[2]) {
+                preg_match('`([\pL][^\s]*)(?:\s+as\s+([\pL][^\s]*))?`ui', $case, $case);
+                if (isset($case[2])) {
                     $index[$case[2]] = $case[1];
                 } else {
                     if (false !== $pos = strrpos($case[1], '\\')) {
