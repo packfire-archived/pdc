@@ -111,12 +111,21 @@ class Analyzer implements IAnalyzer {
         foreach($classes as $name){
             // TODO may be much faster to use strpos(..) !== false
             if(!preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
-                $resolved = $name;
-                if(isset($index[$name])){
-                    $used[$name] = true;
-                    $resolved = $index[$name];
+                $idxName = $name;
+                if ($idxLength = strpos($name, '\\')) {
+                    $idxName = substr($name, 0, $idxLength);
+                    $name = substr($name, $idxLength);
+                }
+                // index
+                if(isset($index[$idxName])){
+                    $used[$idxName] = true;
+                    $resolved = $index[$idxName] . ($name===$idxName?'':$name);
+                // relative
                 }elseif(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
+                // absolute
+                }else{
+                    $resolved = $name;
                 }
                 if(!self::checkClassExists($resolved)){
                     $report->increment(ReportType::NOT_FOUND, $resolved);
