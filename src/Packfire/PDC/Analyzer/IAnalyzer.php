@@ -24,9 +24,9 @@ use Packfire\PDC\Report\IReport;
  * @link https://github.com/packfire/pdc/
  */
 interface IAnalyzer {
-    
+
     public function __construct(IFile $file);
-    
+
     public function analyze(IReport $report);
-    
+
 }
