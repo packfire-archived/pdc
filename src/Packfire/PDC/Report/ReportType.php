@@ -28,5 +28,5 @@ class ReportType {
     const NO_NAMESPACE = 300;
     const NOT_FOUND = 400;
     const UNUSED = 500;
-	
+
 }

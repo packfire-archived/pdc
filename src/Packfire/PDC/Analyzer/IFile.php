@@ -22,13 +22,13 @@ namespace Packfire\PDC\Analyzer;
  * @link https://github.com/packfire/pdc/
  */
 interface IFile {
-    
+
     public function __construct($path);
-    
+
     public function source();
-    
+
     public function path();
-    
+
     public function className();
-    
+
 }
