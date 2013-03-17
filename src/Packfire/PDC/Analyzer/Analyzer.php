@@ -173,7 +173,7 @@ class Analyzer implements IAnalyzer {
             // comments
             '`//.+$`um',
             // class/ interface/ trait body
-            '`(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
+            '`(?<=^|[^\pL\pN])(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
         );
         $head = preg_replace($strip, '', $this->source);
         preg_match_all('`^use\s+(\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
