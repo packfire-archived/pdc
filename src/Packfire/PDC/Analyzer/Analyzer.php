@@ -68,14 +68,14 @@ class Analyzer implements IAnalyzer {
     }
 
     protected static function checkClassExists($namespace){
-        if(class_exists($namespace) || interface_exists($namespace)){
+        if(class_exists($namespace) || interface_exists($namespace) || trait_exists($namespace)){
             return true;
         }else{
             $autoloads = spl_autoload_functions();
             if($autoloads){
                 foreach($autoloads as $autoload){
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace)){
+                    if(class_exists($namespace) || interface_exists($namespace) || trait_exists($namespace)){
                         return true;
                     }
                 }
@@ -103,7 +103,8 @@ class Analyzer implements IAnalyzer {
         $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
-            if(!preg_match('`(?:parent|self|static|^\$)`ui', $name)){
+            // TODO may be much faster to use strpos(..) !== false
+            if(!preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
                 $resolved = $name;
                 if(isset($index[$name])){
                     $used[$name] = true;
