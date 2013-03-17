@@ -176,7 +176,7 @@ class Analyzer implements IAnalyzer {
             '`(?<=^|[^\pL\pN])(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
         );
         $head = preg_replace($strip, '', $this->source);
-        preg_match_all('`^use\s+(\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
+        preg_match_all('`^use\s+(\\\\?\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
             foreach($use as $case){
