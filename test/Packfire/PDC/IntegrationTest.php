@@ -26,6 +26,9 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function testFixtures($fixture)
     {
+        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+            $this->markTestSkipped('Integration testing requires PHP 5.4 or newer.');
+        }
         $cmd = realpath(__DIR__ . '/../../../bin/pdc');
         $this->assertTrue(file_exists($cmd), 'PDC binary not found.');
 
