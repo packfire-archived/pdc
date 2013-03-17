@@ -75,7 +75,7 @@ class Analyzer implements IAnalyzer {
             if($autoloads){
                 foreach($autoloads as $autoload){
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace) || trait_exists($namespace)){
+                    if(class_exists($namespace, false) || interface_exists($namespace, false) || trait_exists($namespace, false)){
                         return true;
                     }
                 }
