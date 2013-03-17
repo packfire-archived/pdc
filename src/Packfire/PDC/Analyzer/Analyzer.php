@@ -85,12 +85,12 @@ class Analyzer implements IAnalyzer {
     }
 
     protected function checkMismatch($name) {
-        return preg_match('`(class|interface|trait)\\s' . $name . '\\W`s', $this->source) == 1;
+        return preg_match('`(?:class|interface|trait)\\s' . $name . '\\W`su', $this->source) == 1;
     }
 
     protected function fetchNamespace() {
         $namespace = '';
-        if (preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $this->source, $namespace)) {
+        if (preg_match('`namespace\\s+(?<namespace>\pL[^\s]*);`su', $this->source, $namespace)) {
             $namespace = $namespace['namespace'];
         } else {
             $namespace = '';
@@ -103,7 +103,7 @@ class Analyzer implements IAnalyzer {
         $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
-            if(!preg_match('`(parent|self|static|^\$)`', $name)){
+            if(!preg_match('`(?:parent|self|static|^\$)`ui', $name)){
                 $resolved = $name;
                 if(isset($index[$name])){
                     $used[$name] = true;
@@ -149,13 +149,13 @@ class Analyzer implements IAnalyzer {
     protected function useIndexing() {
         $index = array();
         $uses = array();
-        preg_match_all('{use\\s([a-z\\\\\\s,]+);}i', $this->source, $uses, PREG_SET_ORDER);
+        preg_match_all('{use\\s+([^;]+);}ui', $this->source, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
             foreach($use as $case){
-                preg_match('{([a-z\\\\]+)(\\sas\\s([a-z\\\\]+)|)}i', $case, $case);
-                if ($case[2]) {
-                    $index[$case[3]] = $case[1];
+                preg_match('{(\pL[^\s]*)(?:\\s+as\\s+(\pL[^\s]*))?}ui', $case, $case);
+                if (isset($case[2]) && $case[2]) {
+                    $index[$case[2]] = $case[1];
                 } else {
                     if (false !== $pos = strrpos($case[1], '\\')) {
                         $alias = substr($case[1], $pos + 1);
