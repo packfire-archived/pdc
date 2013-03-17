@@ -55,6 +55,8 @@ class Analyzer implements IAnalyzer {
      */
     private $count;
 
+    private static $supportTraits;
+
     /**
      * Create a new Analyzer object
      * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
@@ -65,17 +67,21 @@ class Analyzer implements IAnalyzer {
         $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
         $this->count = count($this->tokens);
+
+        if (!isset(self::$supportTraits)) {
+            self::$supportTraits = function_exists('trait_exists');
+        }
     }
 
     protected static function checkClassExists($namespace){
-        if(class_exists($namespace) || interface_exists($namespace)){
+        if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
             return true;
         }else{
             $autoloads = spl_autoload_functions();
             if($autoloads){
                 foreach($autoloads as $autoload){
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace)){
+                    if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
                         return true;
                     }
                 }
@@ -103,7 +109,8 @@ class Analyzer implements IAnalyzer {
         $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
-            if(!preg_match('`(?:parent|self|static|^\$)`ui', $name)){
+            // TODO may be much faster to use strpos(..) !== false
+            if(!preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
                 $resolved = $name;
                 if(isset($index[$name])){
                     $used[$name] = true;
