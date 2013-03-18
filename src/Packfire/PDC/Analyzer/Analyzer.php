@@ -110,7 +110,7 @@ class Analyzer implements IAnalyzer {
         $used = array();
         foreach($classes as $name){
             // TODO may be much faster to use strpos(..) !== false
-            if(!preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
+            if($name && !preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
                 $idxName = $name;
                 if ($idxLength = strpos($name, '\\')) {
                     $idxName = substr($name, 0, $idxLength);
