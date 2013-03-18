@@ -188,7 +188,6 @@ class Analyzer implements IAnalyzer {
                         $alias = substr($case[1], $pos + 1);
                     } else {
                         $alias = $case[1];
-                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
                     }
                     $index[$alias] = $case[1];
                 }
