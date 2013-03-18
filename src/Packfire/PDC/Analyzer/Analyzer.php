@@ -3,7 +3,7 @@
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
- * 
+ *
  * Released open source under New BSD 3-Clause License.
  * Copyright (c) Sam-Mauris Yong <sam@mauris.sg>
  * All rights reserved.
@@ -17,7 +17,7 @@ use Packfire\PDC\Toolbelt;
 
 /**
  * Analyzes source code for namespace, class declaration and usage
- * 
+ *
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
@@ -146,27 +146,57 @@ class Analyzer implements IAnalyzer {
         $this->checkClasses($namespace, $report);
     }
 
+    /**
+     * Get all use declarations by alias.
+     *
+     * @return array
+     */
     protected function useIndexing() {
+        $isAs = $isUse = false;
+        $idxName = $alias = '';
         $index = array();
-        $uses = array();
-        preg_match_all('{use\\s([a-z\\\\\\s,]+);}i', $this->source, $uses, PREG_SET_ORDER);
-        foreach ($uses as $use) {
-            $use = explode(',', $use[1]);
-            foreach($use as $case){
-                preg_match('{([a-z\\\\]+)(\\sas\\s([a-z\\\\]+)|)}i', $case, $case);
-                if ($case[2]) {
-                    $index[$case[3]] = $case[1];
-                } else {
-                    if (false !== $pos = strrpos($case[1], '\\')) {
-                        $alias = substr($case[1], $pos + 1);
-                    } else {
-                        $alias = $case[1];
-                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
+
+        foreach ($this->tokens as &$t) {
+            $isArray = is_array($t);
+            // ignore list
+            if ($isArray) {
+                switch($t[0]) {
+                    case T_USE:
+                        $isUse = true;
+                    case T_WHITESPACE:
+                    case T_COMMENT:
+                    case T_DOC_COMMENT:
+                        continue 2;
+                    case T_INTERFACE:
+                    case T_CLASS:
+                    case T_TRAIT:
+                        break 2;
+                    default:
+                }
+            }
+            if ($isUse) {
+                // NS_SEPARATOR, T_STRING and T_AS
+                if ($isArray) {
+                    if ($t[0] == T_AS) {
+                        $isAs = true;
+                        continue;
                     }
-                    $index[$alias] = $case[1];
+                    $idxName = $t[1];
+                    if (!$isAs) {
+                        $alias .= $idxName;
+                    }
+                // separators
+                } elseif ($t === ',' || $t === ';') {
+                    $index[$idxName] = $alias;
+                    $alias = '';
+                    $isAs = false;
+                    if ($t === ';') {
+                        $isUse = false;
+                    }
                 }
             }
         }
+
         return $index;
     }
 

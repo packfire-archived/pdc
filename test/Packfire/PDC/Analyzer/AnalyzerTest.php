@@ -16,7 +16,7 @@ class AnalyzerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($path));
         return $file;
     }
-    
+
     protected function buildReport($file){
         $report = $this->getMock('\Packfire\PDC\Report\Report');
         $report->expects($this->once())
@@ -32,7 +32,7 @@ class AnalyzerTest extends \PHPUnit_Framework_TestCase
     {
         $source = <<<'EOT'
 <?php
-    
+
 class Example{
 
 }
@@ -40,5 +40,77 @@ EOT;
         $file = $this->buildFile('Test/Example.php', $source);
         $analyzer = new Analyzer($file);
         $analyzer->analyze($this->buildReport($file));
+    }
+
+    /**
+     * @covers Packfire\PDC\Analyzer\Analyzer::useIndexing
+     */
+    public function testUseIndexing()
+    {
+        $source = <<<'EOT'
+<?php
+
+/**
+ *
+ * @author https://github.com/goatherd
+ *
+ */
+namespace Vendor\Package;
+
+use Vendor2\Päck as Assert;
+  use Doctrine\X\Y AS /*some*/ ORM;
+// comment
+
+/*
+use something;
+ */
+use Some\InterfaceInterface, // with comment, mean characters and use something;
+    SomeOther\AbstractClass as BaseClass,
+YetAnOther\ClassX;
+
+use DateTime;
+
+// that one is not psr-0 but it should work too
+' use ClassX;';
+
+/**
+ * @ORM\Entity('name')
+ * @note tokenizer test
+ */
+class MyClass extends BaseClass implements InterfaceInterface
+{
+    /**
+     * @Assert\Length(min=3,max=5)
+     * @var array
+     */
+    protected $property;
+
+    /**
+     * Some method.
+     *
+     * @param SomeClass $arg description
+     *
+     * @return void
+     */
+    public function someMethod(SomeClass $arg) {}
+}
+EOT;
+        $file = $this->buildFile('Test/Example.php', $source);
+        $analyzer = new Analyzer($file);
+
+        $class = new \ReflectionClass(get_class($analyzer));
+        $method = $class->getMethod('useIndexing');
+        $method->setAccessible(true);
+
+        $report = $method->invokeArgs($analyzer, array());
+        $expected = array(
+          'Assert' => 'Vendor2\Päck',
+          'ORM' => 'Doctrine\X\Y',
+          'InterfaceInterface' => 'Some\InterfaceInterface',
+          'BaseClass' => 'SomeOther\AbstractClass',
+          'ClassX' =>'YetAnOther\ClassX',
+          'DateTime' => 'DateTime',
+        );
+        $this->assertEquals($report, $expected);
     }
 }
