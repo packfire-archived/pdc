@@ -55,6 +55,8 @@ class Analyzer implements IAnalyzer {
      */
     private $count;
 
+    private static $supportTraits;
+
     /**
      * Create a new Analyzer object
      * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
@@ -65,17 +67,21 @@ class Analyzer implements IAnalyzer {
         $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
         $this->count = count($this->tokens);
+
+        if (!isset(self::$supportTraits)) {
+            self::$supportTraits = function_exists('trait_exists');
+        }
     }
 
     protected static function checkClassExists($namespace){
-        if(class_exists($namespace) || interface_exists($namespace)){
+        if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
             return true;
         }else{
             $autoloads = spl_autoload_functions();
             if($autoloads){
                 foreach($autoloads as $autoload){
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace)){
+                    if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
                         return true;
                     }
                 }
@@ -103,13 +109,23 @@ class Analyzer implements IAnalyzer {
         $classes = $this->findUsages();
         $used = array();
         foreach($classes as $name){
-            if(!preg_match('`(?:parent|self|static|^\$)`ui', $name)){
-                $resolved = $name;
-                if(isset($index[$name])){
-                    $used[$name] = true;
-                    $resolved = $index[$name];
+            // TODO may be much faster to use strpos(..) !== false
+            if($name && !preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
+                $idxName = $name;
+                if ($idxLength = strpos($name, '\\')) {
+                    $idxName = substr($name, 0, $idxLength);
+                    $name = substr($name, $idxLength);
+                }
+                // index
+                if(isset($index[$idxName])){
+                    $used[$idxName] = true;
+                    $resolved = $index[$idxName] . ($name===$idxName?'':$name);
+                // relative
                 }elseif(substr($name, 0, 1) != '\\'){
                     $resolved = $namespace . '\\' . $name;
+                // absolute
+                }else{
+                    $resolved = $name;
                 }
                 if(!self::checkClassExists($resolved)){
                     $report->increment(ReportType::NOT_FOUND, $resolved);
@@ -157,10 +173,10 @@ class Analyzer implements IAnalyzer {
             // comments
             '`//.+$`um',
             // class/ interface/ trait body
-            '`(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
+            '`(?<=^|[^\pL\pN])(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
         );
         $head = preg_replace($strip, '', $this->source);
-        preg_match_all('`^use\s+(\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
+        preg_match_all('`^\s*use\s+(\\\\?\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
             foreach($use as $case){
@@ -172,7 +188,6 @@ class Analyzer implements IAnalyzer {
                         $alias = substr($case[1], $pos + 1);
                     } else {
                         $alias = $case[1];
-                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
                     }
                     $index[$alias] = $case[1];
                 }
