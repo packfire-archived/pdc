@@ -17,6 +17,7 @@ before_script:
 
 script:
     - "phpunit -c test"
+    - "phpcs --encoding=utf-8 --extensions=php --standard=test/phpcs.xml -nsp ./"
 
 after_script:
   - "wget --quiet http://mauris.sg/bin/pdc.phar && php pdc.phar src"
