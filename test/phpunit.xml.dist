@@ -4,6 +4,13 @@
     colors="true"
 >
 
+    <filter>
+        <blacklist>
+            <directory>../vendor</directory>
+        </blacklist>
+    </filter>
+
+
     <testsuites>
         <testsuite>
             <directory suffix="Test.php">.</directory>
