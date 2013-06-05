@@ -6,7 +6,8 @@ namespace Packfire\PDC\Analyzer;
  */
 class AnalyzerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function buildFile($path, $source){
+    protected function buildFile($path, $source)
+    {
         $file = $this->getMock('\Packfire\PDC\Analyzer\File', array(), array($path));
         $file->expects($this->once())
                 ->method('source')
@@ -17,7 +18,8 @@ class AnalyzerTest extends \PHPUnit_Framework_TestCase
         return $file;
     }
     
-    protected function buildReport($file){
+    protected function buildReport($file)
+    {
         $report = $this->getMock('\Packfire\PDC\Report\Report');
         $report->expects($this->once())
                 ->method('processFile')

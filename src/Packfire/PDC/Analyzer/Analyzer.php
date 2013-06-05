@@ -126,10 +126,10 @@ class Analyzer implements IAnalyzer
                 if (isset($index[$idxName])) {
                     $used[$idxName] = true;
                     $resolved = $index[$idxName] . ($name===$idxName?'':$name);
-                // relative
+                    // relative
                 } elseif (substr($name, 0, 1) != '\\') {
                     $resolved = $namespace . '\\' . $name;
-                // absolute
+                    // absolute
                 } else {
                     $resolved = $name;
                 }
@@ -170,7 +170,8 @@ class Analyzer implements IAnalyzer
     }
 
     // TODO should rather use the tokenizer and be less strict with allowed namespaces
-    protected function useIndexing() {
+    protected function useIndexing()
+    {
         $index = array();
         $uses = array();
         // clean up header
@@ -259,63 +260,63 @@ class Analyzer implements IAnalyzer
                             break;
                         }
                     }
-                }elseif($current == T_FUNCTION){
+                } elseif ($current == T_FUNCTION) {
                     $idx += 3;
-                    if($this->tokens[$idx] == '('){
+                    if ($this->tokens[$idx] == '(') {
                         while (++$idx < $this->count) {
                             if (is_array($this->tokens[$idx])) {
                                 $current = $this->tokens[$idx][0];
-                                if($current == T_NS_SEPARATOR
-                                        || ($current == T_STRING && !in_array($this->tokens[$idx][1], array('null', 'false', 'true')))){
+                                if ($current == T_NS_SEPARATOR
+                                    || ($current == T_STRING && !in_array($this->tokens[$idx][1], array('null', 'false', 'true')))) {
                                     $classes[] = $this->fullClass($idx);
                                 }
-                            }elseif($this->tokens[$idx] == '='){
+                            } elseif ($this->tokens[$idx] == '=') {
                                 while (++$idx < $this->count) {
                                     $nest = 0;
-                                    if(is_array($this->tokens[$idx]) && $this->tokens[$idx][0] == T_PAAMAYIM_NEKUDOTAYIM){
+                                    if (is_array($this->tokens[$idx]) && $this->tokens[$idx][0] == T_PAAMAYIM_NEKUDOTAYIM) {
                                         while (!is_array($this->tokens[$idx-1]) || $this->tokens[$idx - 1][0] == T_NS_SEPARATOR
-                                                || $this->tokens[$idx - 1][0] == T_STRING) {
+                                            || $this->tokens[$idx - 1][0] == T_STRING) {
                                             --$idx;
                                         }
                                         $classes[] = $this->fullClass($idx);
                                         while (++$idx < $this->count) {
-                                            if($nest == 0 && $this->tokens[$idx] == ','){
+                                            if ($nest == 0 && $this->tokens[$idx] == ',') {
                                                 break;
-                                            }elseif($this->tokens[$idx] == '('){
+                                            } elseif ($this->tokens[$idx] == '(') {
                                                 ++$nest;
-                                            }elseif($this->tokens[$idx] == ')'){
+                                            } elseif ($this->tokens[$idx] == ')') {
                                                 --$nest;
                                             }
-                                            if($nest < 0){
+                                            if ($nest < 0) {
                                                 --$idx;
                                                 break;
                                             }
                                         }
                                         break;
-                                    }elseif($this->tokens[$idx] == '('){
+                                    } elseif ($this->tokens[$idx] == '(') {
                                         ++$nest;
-                                    }elseif($this->tokens[$idx] == ')'){
+                                    } elseif ($this->tokens[$idx] == ')') {
                                         --$nest;
                                     }
-                                    if($nest < 0){
+                                    if ($nest < 0) {
                                         --$idx;
                                         break;
                                     }
                                 }
-                            }elseif($this->tokens[$idx] == ')'){
+                            } elseif ($this->tokens[$idx] == ')') {
                                 break;
                             }
                         }
                     }
-                }elseif($current == T_CLASS){
+                } elseif ($current == T_CLASS) {
                     $inClass = true;
-                }elseif($inClass && $classLevel == 1 && $current == T_USE){
+                } elseif ($inClass && $classLevel == 1 && $current == T_USE) {
                     // traits usage
                     while (++$idx < $this->count) {
                         if (is_array($this->tokens[$idx])) {
                             $current = $this->tokens[$idx][0];
                             if ($current == T_STRING
-                                    || $current == T_NS_SEPARATOR) {
+                                || $current == T_NS_SEPARATOR) {
                                 $classes[] = $this->fullClass($idx);
                                 --$idx;
                             }
@@ -324,13 +325,13 @@ class Analyzer implements IAnalyzer
                         }
                     }
                 }
-            }elseif($inClass){
-                if($this->tokens[$idx] == '{'){
+            } elseif ($inClass) {
+                if ($this->tokens[$idx] == '{') {
                     ++$classLevel;
-                }elseif($this->tokens[$idx] == '}'){
+                } elseif ($this->tokens[$idx] == '}') {
                     --$classLevel;
                 }
-                if($classLevel == 0){
+                if ($classLevel == 0) {
                     $inClass = false;
                 }
             }
@@ -345,7 +346,8 @@ class Analyzer implements IAnalyzer
      * @return string Returns the full namespace or classname read
      * @since 1.0.4
      */
-    protected function fullClass(&$start) {
+    protected function fullClass(&$start)
+    {
         $class = '';
         do {
             if (is_array($this->tokens[$start])) {
@@ -362,5 +364,4 @@ class Analyzer implements IAnalyzer
         } while (++$start < $this->count);
         return $class;
     }
-
 }

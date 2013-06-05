@@ -23,10 +23,10 @@ use Packfire\PDC\Report\IReport;
  * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-interface IAnalyzer {
+interface IAnalyzer
+{
 
     public function __construct(IFile $file);
 
     public function analyze(IReport $report);
-
 }

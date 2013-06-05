@@ -28,7 +28,8 @@ class ReportTest extends \PHPUnit_Framework_TestCase
     {
     }
     
-    protected function getValue($object, $property){
+    protected function getValue($object, $property)
+    {
         $prop = new \ReflectionProperty(get_class($object), $property);
         $prop->setAccessible(true);
         return $prop->getValue($object);
@@ -50,7 +51,8 @@ class ReportTest extends \PHPUnit_Framework_TestCase
      * @covers Packfire\PDC\Report\Report::add
      * @expectedException \Exception
      */
-    public function testBadAdd(){
+    public function testBadAdd()
+    {
         $this->object->add('test', 'anyhow');
     }
 
