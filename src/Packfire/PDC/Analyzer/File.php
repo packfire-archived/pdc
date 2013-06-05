@@ -31,6 +31,7 @@ class File implements IFile {
 
     public function className() {
         return preg_replace('{\.php$}', '', basename($this->path));
+        return preg_replace('{\.php$}i', '', basename($this->path));
     }
 
     public function path() {
