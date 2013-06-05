@@ -3,9 +3,15 @@
     bootstrap="bootstrap.php"
     colors="true"
 >
+
     <testsuites>
         <testsuite>
             <directory suffix="Test.php">.</directory>
         </testsuite>
     </testsuites>
+
+    <logging>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
+    </logging>
+
 </phpunit>
