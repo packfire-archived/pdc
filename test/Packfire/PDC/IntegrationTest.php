@@ -24,14 +24,20 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function testFixtures($fixture)
     {
-        // TODO add non-*nix support
-        $cmd = realpath(__DIR__ . '/../../../bin/pdc');
-        $this->assertTrue(file_exists($cmd), 'PDC binary not found.');
+        $binaryPath = realpath(__DIR__ . '/../../../bin/pdc');
+        $this->assertTrue(file_exists($binaryPath), 'PDC binary not found.');
+        $binaryPath = escapeshellarg($binaryPath);
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $cmd = 'php ' . $binaryPath;
+        } else {
+            $cmd = '/usr/bin/env php ' . $binaryPath;
+        }
 
         $autoload = escapeshellarg($fixture . '/autoload.php');
         $src = escapeshellarg($fixture . '/src');
 
-        $report = `/usr/bin/env php $cmd --bootstrap=$autoload $src`;
+        $line = $cmd . ' --bootstrap=' . $autoload . ' ' . $src . '';
+        $report = shell_exec($line);
 
         $this->assertStringEndsWith("-- PDC Complete --\n", $report);
         $this->assertThat($report, $this->logicalNot($this->stringContains("\nUnused:", false)));
