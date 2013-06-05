@@ -25,7 +25,8 @@ use Packfire\PDC\Toolbelt;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Analyzer implements IAnalyzer {
+class Analyzer implements IAnalyzer
+{
 
     /**
      * The file object
@@ -62,7 +63,8 @@ class Analyzer implements IAnalyzer {
      * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
      * @since 1.0.4
      */
-    public function __construct(IFile $file) {
+    public function __construct(IFile $file)
+    {
         $this->file = $file;
         $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
@@ -73,15 +75,16 @@ class Analyzer implements IAnalyzer {
         }
     }
 
-    protected static function checkClassExists($namespace){
-        if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
+    protected static function checkClassExists($namespace)
+    {
+        if (class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)) {
             return true;
-        }else{
+        } else {
             $autoloads = spl_autoload_functions();
-            if($autoloads){
-                foreach($autoloads as $autoload){
+            if ($autoloads) {
+                foreach ($autoloads as $autoload) {
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)){
+                    if (class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)) {
                         return true;
                     }
                 }
@@ -90,11 +93,13 @@ class Analyzer implements IAnalyzer {
         }
     }
 
-    protected function checkMismatch($name) {
+    protected function checkMismatch($name)
+    {
         return preg_match('`(?:class|interface|trait)\s+' . $name . '\s`su', $this->source) == 1;
     }
 
-    protected function fetchNamespace() {
+    protected function fetchNamespace()
+    {
         $namespace = '';
         if (preg_match('`namespace\s+(?<namespace>\pL[^;]*)\s*;`su', $this->source, $namespace)) {
             $namespace = $namespace['namespace'];
@@ -104,37 +109,38 @@ class Analyzer implements IAnalyzer {
         return $namespace;
     }
 
-    protected function checkClasses($namespace, IReport $report){
+    protected function checkClasses($namespace, IReport $report)
+    {
         $index = $this->useIndexing();
         $classes = $this->findUsages();
         $used = array();
-        foreach($classes as $name){
+        foreach ($classes as $name) {
             // TODO may be much faster to use strpos(..) !== false
-            if($name && !preg_match('`(?:parent|self|static|^\$)`Sui', $name)){
+            if ($name && !preg_match('`(?:parent|self|static|^\$)`Sui', $name)) {
                 $idxName = $name;
                 if ($idxLength = strpos($name, '\\')) {
                     $idxName = substr($name, 0, $idxLength);
                     $name = substr($name, $idxLength);
                 }
                 // index
-                if(isset($index[$idxName])){
+                if (isset($index[$idxName])) {
                     $used[$idxName] = true;
                     $resolved = $index[$idxName] . ($name===$idxName?'':$name);
                 // relative
-                }elseif(substr($name, 0, 1) != '\\'){
+                } elseif (substr($name, 0, 1) != '\\') {
                     $resolved = $namespace . '\\' . $name;
                 // absolute
-                }else{
+                } else {
                     $resolved = $name;
                 }
-                if(!self::checkClassExists($resolved)){
+                if (!self::checkClassExists($resolved)) {
                     $report->increment(ReportType::NOT_FOUND, $resolved);
                 }
             }
         }
         $diff = array_diff(array_keys($index), array_keys($used));
-        if(count($diff) > 0){
-            foreach($diff as $unused){
+        if (count($diff) > 0) {
+            foreach ($diff as $unused) {
                 $report->increment(ReportType::UNUSED, $unused);
             }
         }
@@ -145,7 +151,8 @@ class Analyzer implements IAnalyzer {
      * @param \Packfire\PDC\Report\IReport $report The report to be generated later
      * @since 1.0.4
      */
-    public function analyze(IReport $report) {
+    public function analyze(IReport $report)
+    {
         $report->processFile($this->file->path());
         $report->increment(ReportType::FILE);
         $className = $this->file->className();
@@ -179,7 +186,7 @@ class Analyzer implements IAnalyzer {
         preg_match_all('`^\s*use\s+(\\\\?\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
-            foreach($use as $case){
+            foreach ($use as $case) {
                 preg_match('`([\pL][^\s]*)(?:\s+as\s+([\pL][^\s]*))?`ui', $case, $case);
                 if (isset($case[2])) {
                     $index[$case[2]] = $case[1];
@@ -201,7 +208,8 @@ class Analyzer implements IAnalyzer {
      * @return array Returns an array of string containing all the class names
      * @since 1.0.4
      */
-    protected function findUsages() {
+    protected function findUsages()
+    {
         $classes = array();
         $inClass = false;
         $classLevel = 0;
@@ -215,7 +223,7 @@ class Analyzer implements IAnalyzer {
                 } elseif ($current == T_PAAMAYIM_NEKUDOTAYIM) {
                     $reset = $idx;
                     while ($this->tokens[$idx - 1][0] == T_NS_SEPARATOR
-                    || $this->tokens[$idx - 1][0] == T_STRING) {
+                        || $this->tokens[$idx - 1][0] == T_STRING) {
                         --$idx;
                     }
                     $class = $this->fullClass($idx);
