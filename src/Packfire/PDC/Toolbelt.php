@@ -21,7 +21,8 @@ namespace Packfire\PDC;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Toolbelt {
+class Toolbelt
+{
 
     /**
      * Get the class name from the entire namespace
@@ -29,7 +30,8 @@ class Toolbelt {
      * @return string Returns the class name extracted from the namespace
      * @since 1.0.4
      */
-    public static function classFromNamespace($namespace){
+    public static function classFromNamespace($namespace)
+    {
         return ltrim(substr($namespace, strrpos($namespace, '\\')), '\\');
     }
 
@@ -40,15 +42,14 @@ class Toolbelt {
      * @return double Returns the number rounded
      * @since 1.0.4
      */
-    public static function significantFigure($value, $sigFigs = 3){
+    public static function significantFigure($value, $sigFigs = 3)
+    {
         //convert to scientific notation e.g. 12345 -> 1.2345x10^4
         //where $significand is 1.2345 and $exponent is 4
         $exponent = floor(log10(abs($value))+1);
-        $significand = round(($value
-            / pow(10, $exponent))
-            * pow(10, $sigFigs))
-            / pow(10, $sigFigs);
+        $significand = round(
+            ($value / pow(10, $exponent)) * pow(10, $sigFigs)
+        ) / pow(10, $sigFigs);
         return $significand * pow(10, $exponent);
     }
-
 }

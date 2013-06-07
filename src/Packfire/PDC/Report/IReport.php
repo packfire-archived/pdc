@@ -21,8 +21,9 @@ namespace Packfire\PDC\Report;
  * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-interface IReport {
-    
+interface IReport
+{
+
     public function add($key, IIndex $index);
     
     public function processFile($file);
@@ -30,5 +31,4 @@ interface IReport {
     public function increment($key, $details = null);
     
     public function report();
-    
 }

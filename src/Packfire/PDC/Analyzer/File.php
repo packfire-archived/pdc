@@ -21,24 +21,28 @@ namespace Packfire\PDC\Analyzer;
  * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-class File implements IFile {
+class File implements IFile
+{
     
     private $path;
     
-    public function __construct($path) {
+    public function __construct($path)
+    {
         $this->path = $path;
     }
 
-    public function className() {
-        return preg_replace('{\.php$}', '', basename($this->path));
+    public function className()
+    {
+        return preg_replace('{\.php$}i', '', basename($this->path));
     }
 
-    public function path() {
+    public function path()
+    {
         return $this->path;
     }
 
-    public function source() {
+    public function source()
+    {
         return file_get_contents($this->path);
     }
-    
 }

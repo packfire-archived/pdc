@@ -1,5 +1,9 @@
 {
-    "hash": "0e15d9b18ae7d17772fc6ca059c7ef77",
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "c0aeef811805c1b1d3089c14ae18f237",
     "packages": [
         {
             "name": "packfire/options",
@@ -48,12 +52,20 @@
             "time": "2012-12-24 12:35:55"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
     "minimum-stability": "stable",
     "stability-flags": [
+
+    ],
+    "platform": {
+        "php": ">=5.3.0"
+    },
+    "platform-dev": [
 
     ]
 }

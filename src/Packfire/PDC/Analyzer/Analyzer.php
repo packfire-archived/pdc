@@ -3,7 +3,7 @@
 /**
  * Packfire Dependency Checker (pdc)
  * By Sam-Mauris Yong
- * 
+ *
  * Released open source under New BSD 3-Clause License.
  * Copyright (c) Sam-Mauris Yong <sam@mauris.sg>
  * All rights reserved.
@@ -17,7 +17,7 @@ use Packfire\PDC\Toolbelt;
 
 /**
  * Analyzes source code for namespace, class declaration and usage
- * 
+ *
  * @author Sam-Mauris Yong <sam@mauris.sg>
  * @copyright Sam-Mauris Yong <sam@mauris.sg>
  * @license http://www.opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
@@ -25,7 +25,8 @@ use Packfire\PDC\Toolbelt;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Analyzer implements IAnalyzer {
+class Analyzer implements IAnalyzer
+{
 
     /**
      * The file object
@@ -55,27 +56,35 @@ class Analyzer implements IAnalyzer {
      */
     private $count;
 
+    private static $supportTraits;
+
     /**
      * Create a new Analyzer object
      * @param \Packfire\PDC\Analyzer\IFile $file The file to analyze
      * @since 1.0.4
      */
-    public function __construct(IFile $file) {
+    public function __construct(IFile $file)
+    {
         $this->file = $file;
         $this->source = $file->source();
         $this->tokens = token_get_all($this->source);
         $this->count = count($this->tokens);
+
+        if (!isset(self::$supportTraits)) {
+            self::$supportTraits = function_exists('trait_exists');
+        }
     }
 
-    protected static function checkClassExists($namespace){
-        if(class_exists($namespace) || interface_exists($namespace)){
+    protected static function checkClassExists($namespace)
+    {
+        if (class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)) {
             return true;
-        }else{
+        } else {
             $autoloads = spl_autoload_functions();
-            if($autoloads){
-                foreach($autoloads as $autoload){
+            if ($autoloads) {
+                foreach ($autoloads as $autoload) {
                     call_user_func($autoload, $namespace);
-                    if(class_exists($namespace) || interface_exists($namespace)){
+                    if (class_exists($namespace) || interface_exists($namespace) || self::$supportTraits && trait_exists($namespace)) {
                         return true;
                     }
                 }
@@ -84,13 +93,15 @@ class Analyzer implements IAnalyzer {
         }
     }
 
-    protected function checkMismatch($name) {
-        return preg_match('`(class|interface|trait)\\s' . $name . '\\W`s', $this->source) == 1;
+    protected function checkMismatch($name)
+    {
+        return preg_match('`(?:class|interface|trait)\s+' . $name . '\s`su', $this->source) == 1;
     }
 
-    protected function fetchNamespace() {
+    protected function fetchNamespace()
+    {
         $namespace = '';
-        if (preg_match('`namespace\\s(?<namespace>[a-zA-Z\\\\]+);`s', $this->source, $namespace)) {
+        if (preg_match('`namespace\s+(?<namespace>\pL[^;]*)\s*;`su', $this->source, $namespace)) {
             $namespace = $namespace['namespace'];
         } else {
             $namespace = '';
@@ -98,27 +109,38 @@ class Analyzer implements IAnalyzer {
         return $namespace;
     }
 
-    protected function checkClasses($namespace, IReport $report){
+    protected function checkClasses($namespace, IReport $report)
+    {
         $index = $this->useIndexing();
         $classes = $this->findUsages();
         $used = array();
-        foreach($classes as $name){
-            if(!preg_match('`(parent|self|static|^\$)`', $name)){
-                $resolved = $name;
-                if(isset($index[$name])){
-                    $used[$name] = true;
-                    $resolved = $index[$name];
-                }elseif(substr($name, 0, 1) != '\\'){
-                    $resolved = $namespace . '\\' . $name;
+        foreach ($classes as $name) {
+            // TODO may be much faster to use strpos(..) !== false
+            if ($name && !preg_match('`(?:parent|self|static|^\$)`Sui', $name)) {
+                $idxName = $name;
+                if ($idxLength = strpos($name, '\\')) {
+                    $idxName = substr($name, 0, $idxLength);
+                    $name = substr($name, $idxLength);
                 }
-                if(!self::checkClassExists($resolved)){
+                // index
+                if (isset($index[$idxName])) {
+                    $used[$idxName] = true;
+                    $resolved = $index[$idxName] . ($name===$idxName?'':$name);
+                    // relative
+                } elseif (substr($name, 0, 1) != '\\') {
+                    $resolved = $namespace . '\\' . $name;
+                    // absolute
+                } else {
+                    $resolved = $name;
+                }
+                if (!self::checkClassExists($resolved)) {
                     $report->increment(ReportType::NOT_FOUND, $resolved);
                 }
             }
         }
         $diff = array_diff(array_keys($index), array_keys($used));
-        if(count($diff) > 0){
-            foreach($diff as $unused){
+        if (count($diff) > 0) {
+            foreach ($diff as $unused) {
                 $report->increment(ReportType::UNUSED, $unused);
             }
         }
@@ -129,7 +151,8 @@ class Analyzer implements IAnalyzer {
      * @param \Packfire\PDC\Report\IReport $report The report to be generated later
      * @since 1.0.4
      */
-    public function analyze(IReport $report) {
+    public function analyze(IReport $report)
+    {
         $report->processFile($this->file->path());
         $report->increment(ReportType::FILE);
         $className = $this->file->className();
@@ -146,22 +169,33 @@ class Analyzer implements IAnalyzer {
         $this->checkClasses($namespace, $report);
     }
 
-    protected function useIndexing() {
+    // TODO should rather use the tokenizer and be less strict with allowed namespaces
+    protected function useIndexing()
+    {
         $index = array();
         $uses = array();
-        preg_match_all('{use\\s([a-z\\\\\\s,]+);}i', $this->source, $uses, PREG_SET_ORDER);
+        // clean up header
+        $strip = array(
+            // docblocks
+            '`/[*].+?[*]/`su',
+            // comments
+            '`//.+$`um',
+            // class/ interface/ trait body
+            '`(?<=^|[^\pL\pN])(?:abstract\s+)?(?:class|interface|trait)\s+[\pL].*$`Ssui'
+        );
+        $head = preg_replace($strip, '', $this->source);
+        preg_match_all('`^\s*use\s+(\\\\?\pL[^;]*);`Smui', $head, $uses, PREG_SET_ORDER);
         foreach ($uses as $use) {
             $use = explode(',', $use[1]);
-            foreach($use as $case){
-                preg_match('{([a-z\\\\]+)(\\sas\\s([a-z\\\\]+)|)}i', $case, $case);
-                if ($case[2]) {
-                    $index[$case[3]] = $case[1];
+            foreach ($use as $case) {
+                preg_match('`([\pL][^\s]*)(?:\s+as\s+([\pL][^\s]*))?`ui', $case, $case);
+                if (isset($case[2])) {
+                    $index[$case[2]] = $case[1];
                 } else {
                     if (false !== $pos = strrpos($case[1], '\\')) {
                         $alias = substr($case[1], $pos + 1);
                     } else {
                         $alias = $case[1];
-                        $index[Toolbelt::classFromNamespace($alias)] = $alias;
                     }
                     $index[$alias] = $case[1];
                 }
@@ -175,7 +209,8 @@ class Analyzer implements IAnalyzer {
      * @return array Returns an array of string containing all the class names
      * @since 1.0.4
      */
-    protected function findUsages() {
+    protected function findUsages()
+    {
         $classes = array();
         $inClass = false;
         $classLevel = 0;
@@ -189,7 +224,7 @@ class Analyzer implements IAnalyzer {
                 } elseif ($current == T_PAAMAYIM_NEKUDOTAYIM) {
                     $reset = $idx;
                     while ($this->tokens[$idx - 1][0] == T_NS_SEPARATOR
-                    || $this->tokens[$idx - 1][0] == T_STRING) {
+                        || $this->tokens[$idx - 1][0] == T_STRING) {
                         --$idx;
                     }
                     $class = $this->fullClass($idx);
@@ -225,63 +260,63 @@ class Analyzer implements IAnalyzer {
                             break;
                         }
                     }
-                }elseif($current == T_FUNCTION){
+                } elseif ($current == T_FUNCTION) {
                     $idx += 3;
-                    if($this->tokens[$idx] == '('){
+                    if ($this->tokens[$idx] == '(') {
                         while (++$idx < $this->count) {
                             if (is_array($this->tokens[$idx])) {
                                 $current = $this->tokens[$idx][0];
-                                if($current == T_NS_SEPARATOR
-                                        || ($current == T_STRING && !in_array($this->tokens[$idx][1], array('null', 'false', 'true')))){
+                                if ($current == T_NS_SEPARATOR
+                                    || ($current == T_STRING && !in_array($this->tokens[$idx][1], array('null', 'false', 'true')))) {
                                     $classes[] = $this->fullClass($idx);
                                 }
-                            }elseif($this->tokens[$idx] == '='){
+                            } elseif ($this->tokens[$idx] == '=') {
                                 while (++$idx < $this->count) {
                                     $nest = 0;
-                                    if(is_array($this->tokens[$idx]) && $this->tokens[$idx][0] == T_PAAMAYIM_NEKUDOTAYIM){
+                                    if (is_array($this->tokens[$idx]) && $this->tokens[$idx][0] == T_PAAMAYIM_NEKUDOTAYIM) {
                                         while (!is_array($this->tokens[$idx-1]) || $this->tokens[$idx - 1][0] == T_NS_SEPARATOR
-                                                || $this->tokens[$idx - 1][0] == T_STRING) {
+                                            || $this->tokens[$idx - 1][0] == T_STRING) {
                                             --$idx;
                                         }
                                         $classes[] = $this->fullClass($idx);
                                         while (++$idx < $this->count) {
-                                            if($nest == 0 && $this->tokens[$idx] == ','){
+                                            if ($nest == 0 && $this->tokens[$idx] == ',') {
                                                 break;
-                                            }elseif($this->tokens[$idx] == '('){
+                                            } elseif ($this->tokens[$idx] == '(') {
                                                 ++$nest;
-                                            }elseif($this->tokens[$idx] == ')'){
+                                            } elseif ($this->tokens[$idx] == ')') {
                                                 --$nest;
                                             }
-                                            if($nest < 0){
+                                            if ($nest < 0) {
                                                 --$idx;
                                                 break;
                                             }
                                         }
                                         break;
-                                    }elseif($this->tokens[$idx] == '('){
+                                    } elseif ($this->tokens[$idx] == '(') {
                                         ++$nest;
-                                    }elseif($this->tokens[$idx] == ')'){
+                                    } elseif ($this->tokens[$idx] == ')') {
                                         --$nest;
                                     }
-                                    if($nest < 0){
+                                    if ($nest < 0) {
                                         --$idx;
                                         break;
                                     }
                                 }
-                            }elseif($this->tokens[$idx] == ')'){
+                            } elseif ($this->tokens[$idx] == ')') {
                                 break;
                             }
                         }
                     }
-                }elseif($current == T_CLASS){
+                } elseif ($current == T_CLASS) {
                     $inClass = true;
-                }elseif($inClass && $classLevel == 1 && $current == T_USE){
+                } elseif ($inClass && $classLevel == 1 && $current == T_USE) {
                     // traits usage
                     while (++$idx < $this->count) {
                         if (is_array($this->tokens[$idx])) {
                             $current = $this->tokens[$idx][0];
                             if ($current == T_STRING
-                                    || $current == T_NS_SEPARATOR) {
+                                || $current == T_NS_SEPARATOR) {
                                 $classes[] = $this->fullClass($idx);
                                 --$idx;
                             }
@@ -290,13 +325,13 @@ class Analyzer implements IAnalyzer {
                         }
                     }
                 }
-            }elseif($inClass){
-                if($this->tokens[$idx] == '{'){
+            } elseif ($inClass) {
+                if ($this->tokens[$idx] == '{') {
                     ++$classLevel;
-                }elseif($this->tokens[$idx] == '}'){
+                } elseif ($this->tokens[$idx] == '}') {
                     --$classLevel;
                 }
-                if($classLevel == 0){
+                if ($classLevel == 0) {
                     $inClass = false;
                 }
             }
@@ -311,7 +346,8 @@ class Analyzer implements IAnalyzer {
      * @return string Returns the full namespace or classname read
      * @since 1.0.4
      */
-    protected function fullClass(&$start) {
+    protected function fullClass(&$start)
+    {
         $class = '';
         do {
             if (is_array($this->tokens[$start])) {
@@ -328,5 +364,4 @@ class Analyzer implements IAnalyzer {
         } while (++$start < $this->count);
         return $class;
     }
-
 }
