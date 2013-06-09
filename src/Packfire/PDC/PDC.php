@@ -30,7 +30,8 @@ use Packfire\PDC\Analyzer\File;
  * @link https://github.com/packfire/pdc/
  */
 
-class PDC {
+class PDC
+{
 
     /**
      * Version of PDC
@@ -70,7 +71,8 @@ class PDC {
      * @param array $args The argument for the console application
      * @since 1.0.4
      */
-    public function __construct($args) {
+    public function __construct($args)
+    {
         array_shift($args);
         $this->optionSet = new OptionSet();
         $this->optionSet->add('bootstrap=', array($this, 'setAutoLoader'), 'Set the script to perform bootstrapping and autoloading.');
@@ -83,13 +85,14 @@ class PDC {
      * Run the console application
      * @since 1.0.4
      */
-    public function run() {
+    public function run()
+    {
         echo "Packfire Dependency Checker Tool\nWritten by Sam-Mauris Yong v" . PDC::VERSION . "\n\n";
 
-        if($this->help){
+        if ($this->help) {
             echo "Usage: php pdc.phar [--bootstrap=vendor/autoload.php] source-dir\n\n";
             echo $this->optionSet->help();
-        }else{
+        } else {
             $startTime = microtime(true);
 
             // perform inclusion of autoloader / performing bootstrap once
@@ -106,14 +109,15 @@ class PDC {
             $report->add(ReportType::NO_NAMESPACE, new ReportIndex('%d files with no namespace declaration', 'No namespace found'));
             $report->add(ReportType::MISMATCH, new ReportIndex('%d file and class name mismatch', 'File and class name mismatch'));
             $report->add(ReportType::NOT_FOUND, new ReportIndex('%d dependencies not found', 'Not found'));
-            $report->add(ReportType::UNUSED, new ReportIndex('%d usused dependncies found', 'Unused'));
+            $report->add(ReportType::UNUSED, new ReportIndex('%d unused dependencies found', 'Unused'));
 
             $paths = explode(PATH_SEPARATOR, $this->path);
-            foreach($paths as $path) {
+            foreach ($paths as $path) {
                 echo "Checking \"$path\"...\n\n";
                 $iterator = new \RecursiveIteratorIterator(
-                                new \RecursiveDirectoryIterator($path),
-                                \RecursiveIteratorIterator::CHILD_FIRST);
+                    new \RecursiveDirectoryIterator($path),
+                    \RecursiveIteratorIterator::CHILD_FIRST
+                );
 
                 foreach ($iterator as $file) {
                     $extension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
@@ -124,7 +128,7 @@ class PDC {
                 }
             }
 
-            if($fileReport->count() == 0){
+            if ($fileReport->count() == 0) {
                 echo "Warning: No files checked\n\n";
             }
 
@@ -135,17 +139,19 @@ class PDC {
         }
     }
 
-    public function setHelp(){
+    public function setHelp()
+    {
         $this->help = true;
     }
 
-    public function setPath($path) {
+    public function setPath($path)
+    {
         $this->help = false;
         $this->path = $path;
     }
 
-    public function setAutoLoader($autoloader) {
+    public function setAutoLoader($autoloader)
+    {
         $this->autoloader = $autoloader;
     }
-
 }

@@ -21,7 +21,8 @@ namespace Packfire\PDC\Report;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Index implements IIndex {
+class Index implements IIndex
+{
 
     /**
      * The counter of the index
@@ -51,7 +52,8 @@ class Index implements IIndex {
      * @param string $message (optional) Detailed message of the index
      * @since 1.0.4
      */
-    public function __construct($summary, $message = null){
+    public function __construct($summary, $message = null)
+    {
         $this->summary = $summary;
         $this->message = $message;
     }
@@ -60,7 +62,8 @@ class Index implements IIndex {
      * Add to the counter
      * @since 1.0.4
      */
-    public function increment(){
+    public function increment()
+    {
         ++$this->counter;
     }
 
@@ -69,7 +72,8 @@ class Index implements IIndex {
      * @return string Returns the summary
      * @since 1.0.4
      */
-    public function summary(){
+    public function summary()
+    {
         return sprintf($this->summary, $this->counter);
     }
 
@@ -78,7 +82,8 @@ class Index implements IIndex {
      * @return string Returns the message string
      * @since 1.0.4
      */
-    public function message(){
+    public function message()
+    {
         return $this->message;
     }
 
@@ -87,8 +92,8 @@ class Index implements IIndex {
      * @return integer Returns the counter
      * @since 1.0.4
      */
-    public function count(){
+    public function count()
+    {
         return $this->counter;
     }
-	
 }

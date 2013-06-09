@@ -13,4 +13,4 @@
 Phar::mapPhar('pdc.phar');
 require 'phar://pdc.phar/bin/pdc';
 
-__HALT_COMPILER();
+__halt_compiler();

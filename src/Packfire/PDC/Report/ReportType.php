@@ -21,12 +21,12 @@ namespace Packfire\PDC\Report;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class ReportType {
+class ReportType
+{
 
     const FILE = 100;
     const MISMATCH = 200;
     const NO_NAMESPACE = 300;
     const NOT_FOUND = 400;
     const UNUSED = 500;
-	
 }

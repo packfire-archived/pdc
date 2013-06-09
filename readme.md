@@ -2,11 +2,11 @@
 
 >Smart little worker that checks on your PHP source code's class dependencies.
 
-Packfire Dependency Checker (PDC) is a tiny tool to run and report on missing dependencies and files with missing namespace declaration in a PSR-0 compliant PHP project. 
+Packfire Dependency Checker (PDC) is a tiny tool to run and report on missing dependencies and files with missing namespace declaration in a [PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md) compliant PHP project. 
 
 While most coding errors are reported, with the new autoloading in PHP 5.3, errors such as:
 
-- Class dependencies linkage breaks after file renamed or mvoed
+- Class dependencies linkage breaks after file renamed or moved
 - Files contain naming mistake in namespaces or classes
 - Problematic `use` statements
 - Unused `use` statements

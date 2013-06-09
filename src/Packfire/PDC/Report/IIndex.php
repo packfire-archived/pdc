@@ -21,9 +21,9 @@ namespace Packfire\PDC\Report;
  * @since 1.0.8
  * @link https://github.com/packfire/pdc/
  */
-interface IIndex extends \Countable {
-    
-    
+interface IIndex extends \Countable
+{
+
     /**
      * Create a new Index object
      * @param string $summary The summary string to display at summary
@@ -51,5 +51,4 @@ interface IIndex extends \Countable {
      * @since 1.0.8
      */
     public function message();
-    
 }

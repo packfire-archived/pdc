@@ -21,13 +21,15 @@ namespace Packfire\PDC\Report;
  * @since 1.0.4
  * @link https://github.com/packfire/pdc/
  */
-class Report implements IReport {
+class Report implements IReport
+{
 
     private $indexes = array();
     private $files = array();
     private $currentFile;
 
-    public function add($key, IIndex $index) {
+    public function add($key, IIndex $index)
+    {
         if ($index instanceof IIndex) {
             $this->indexes[$key] = $index;
         } else {
@@ -35,12 +37,14 @@ class Report implements IReport {
         }
     }
 
-    public function processFile($file) {
+    public function processFile($file)
+    {
         $this->currentFile = $file;
         $this->files[$this->currentFile] = array();
     }
 
-    public function increment($key, $details = null) {
+    public function increment($key, $details = null)
+    {
         if (isset($this->indexes[$key])) {
             $index = $this->indexes[$key];
             $index->increment();
@@ -52,11 +56,12 @@ class Report implements IReport {
         }
     }
 
-    public function report() {
+    public function report()
+    {
         $buffer = '';
         foreach ($this->files as $file => $details) {
             $details = array_filter($details);
-            if(count($details) > 0){
+            if (count($details) > 0) {
                 $buffer .= "[$file]:\n";
                 foreach ($details as $text) {
                     $buffer .= "$text\n";
@@ -75,5 +80,4 @@ class Report implements IReport {
 
         return $buffer;
     }
-
 }
